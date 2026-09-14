@@ -3719,7 +3719,7 @@ function buildPushModal(){
   d.innerHTML=
     '<div class="modal-backdrop"></div>'+
     '<div class="modal-box">'+
-      '<div class="modal-h"><b>企业微信推送配置</b><button class="modal-close" title="关闭">×</button></div>'+
+      '<div class="modal-h"><b>企业微信推送 · 排名榜单</b><button class="modal-close" title="关闭">×</button></div>'+
       '<div class="modal-body">'+
         '<div class="form-section">'+
           '<label>推送范围（项目 / 链路 / 品类 / 月份 决定推送什么数据）</label>'+
@@ -3736,32 +3736,30 @@ function buildPushModal(){
           '</div>'+
           '<div class="form-row">'+
             '<div class="fld"><span class="fld-label">排名档位</span><select id="pTier"><option value="">全部</option><option value="head20">头部 20%</option><option value="midHigh30">中上 30%</option><option value="midLow30">中下 30%</option><option value="tail20">尾部 20%</option></select></div>'+
-            '<div class="fld"><span class="fld-label">TOP 人数</span><input id="pTopN" type="number" min="0" value="0" placeholder="0=全部"></div>'+
-            '<div class="fld"><span class="fld-label">截图范围</span><select id="pCapture"><option value="table">主榜单</option><option value="top">TOP 对比</option><option value="full">完整榜单</option></select></div>'+
+            '<div class="fld"><span class="fld-label">推送条数</span><input id="pTopN" type="number" min="0" value="10" placeholder="0=全部（最多 20 行）"></div>'+
           '</div>'+
         '</div>'+
         '<div class="form-section">'+
-          '<label>目标企业微信群</label>'+
-          '<input id="pGroup" type="text" placeholder="如：北京声乐-管理群">'+
-          '<div class="form-tip">需与最近会话中的群名称一致；首次使用前请让机器人创建者授权「消息」权限。</div>'+
-        '</div>'+
-        '<div class="form-section">'+
-          '<label>定时推送</label>'+
-          '<select id="pSchedule"><option value="">关闭定时</option><option value="0 9 * * *">每天 09:00</option><option value="0 9 * * 1">每周一 09:00</option><option value="0 9 1 * *">每月 1 日 09:00</option></select>'+
+          '<label>推送目标（需本机运行 push_service）</label>'+
+          '<div class="form-row">'+
+            '<div class="fld" style="flex:2"><span class="fld-label">推送服务地址</span><input id="pBase" placeholder="http://127.0.0.1:8899"></div>'+
+            '<div class="fld" style="flex:1"><span class="fld-label">&nbsp;</span><button class="btn" id="pReload" style="width:100%">检测 / 刷新群</button></div>'+
+          '</div>'+
+          '<div class="fld" style="margin-top:8px"><span class="fld-label">目标企业微信群</span><select id="pGroup"><option value="">（未连接推送服务）</option></select></div>'+
         '</div>'+
         '<div id="pPushMsg" class="push-msg"></div>'+
       '</div>'+
       '<div class="modal-actions">'+
-        '<button class="btn" id="pPreview">下载预览图</button>'+
-        '<button class="btn" id="pSaveCfg">保存配置</button>'+
-        '<button class="btn pri" id="pPushNow">立即推送</button>'+
+        '<button class="btn" id="pTest">发送测试</button>'+
+        '<button class="btn pri" id="pPushNow">立即推送榜单</button>'+
       '</div>'+
     '</div>';
   document.body.appendChild(d);
   d.querySelector('.modal-backdrop').onclick=()=>d.classList.remove('show');
   d.querySelector('.modal-close').onclick=()=>d.classList.remove('show');
-  $('#pPreview').onclick=downloadPushPreview;
-  $('#pSaveCfg').onclick=savePushConfig;
+  const pb=$('#pBase'); if(pb){ pb.value=(LS.get('pushBase')||'http://127.0.0.1:8899'); pb.onchange=()=>{ LS.set('pushBase',pb.value.trim()); pLoadChats(true); }; }
+  const rl=$('#pReload'); if(rl) rl.onclick=()=>pLoadChats(true);
+  const ts=$('#pTest'); if(ts) ts.onclick=pTest;
   $('#pPushNow').onclick=pushNow;
 }
 function pushMsg(html, type){
@@ -3778,36 +3776,54 @@ function getPushFormConfig(){
     batch: $('#pBatch').value,
     tier: $('#pTier').value,
     topN: parseInt($('#pTopN').value||'0',10)||0,
-    capture: $('#pCapture').value,
-    groupName: ($('#pGroup').value||'').trim(),
-    schedule: $('#pSchedule').value,
-    enabled: !!($('#pSchedule').value)
+    chatid: $('#pGroup').value
   };
 }
 function setPushForm(cfg){
   const set=(id,v)=>{ const el=$(id); if(el) el.value=v===undefined?'':v; };
   set('#pProject', cfg.project); set('#pLink', cfg.link); set('#pCategory', cfg.category); set('#pMonth', cfg.month);
   set('#pLevel', cfg.level); set('#pMetric', cfg.metric); set('#pBatch', cfg.batch);
-  set('#pTier', cfg.tier); set('#pTopN', cfg.topN||0); set('#pCapture', cfg.capture||'table');
-  set('#pGroup', cfg.groupName); set('#pSchedule', cfg.schedule||'');
+  set('#pTier', cfg.tier); set('#pTopN', cfg.topN===undefined?10:cfg.topN);
 }
 function populatePushScopeOptions(){
   const fp=$('#pProject'), fl=$('#pLink'), fc=$('#pCategory'), fm=$('#pMonth');
   if(!fp) return;
-  const allLinks=Object.keys(PROJECTS).reduce((a,p)=>a.concat(PROJECTS[p].links),[]);
-  fp.innerHTML='<option value="">请选择项目</option>'+Object.keys(PROJECTS).map(p=>'<option value="'+p+'">'+p+'</option>').join('');
-  const links=state.project?PROJECTS[state.project].links:allLinks;
-  fl.innerHTML='<option value="">请选择链路</option>'+links.map(l=>'<option value="'+l+'">链路 '+l+'</option>').join('');
+  /* 选项一律从数据派生（旧的静态 PROJECTS 只有 L2..L6，选不上 紫威L2Y/梓洋L2Y 等真实链路） */
+  const projs=dataProjects();
+  fp.innerHTML='<option value="">请选择项目</option>'+projs.map(p=>'<option value="'+esc(p)+'">'+esc(p)+'</option>').join('');
+  const allLinks=[]; projs.forEach(p=>dataLinks(p).forEach(l=>{ if(allLinks.indexOf(l)<0) allLinks.push(l); }));
+  fl.innerHTML='<option value="">请选择链路</option>'+allLinks.map(l=>'<option value="'+esc(l)+'">链路 '+esc(l)+'</option>').join('');
   fc.innerHTML='<option value="">请选择品类</option>'+CATS.map(c=>'<option value="'+c.v+'">'+c.n+'</option>').join('');
-  const mlist=state.cat?catMonths(state.cat):months();
-  fm.innerHTML='<option value="">请选择月份</option>'+mlist.map(m=>'<option value="'+m+'">'+m+'</option>').join('');
+
+  const fillMonths=(cur)=>{
+    const proj=fp.value||state.project, link=fl.value||state.link, cat=fc.value||state.cat;
+    const rows=allData().filter(r=>(!proj||r._proj===proj)&&(!link||r._link===link)&&(!cat||r._cat===cat));
+    const ms=distinct(rows,r=>r['月份']).filter(x=>x).sort();
+    fm.innerHTML='<option value="">请选择月份</option>'+ms.map(m=>'<option value="'+esc(m)+'">'+esc(m)+'</option>').join('');
+    if(cur && ms.indexOf(cur)>=0) fm.value=cur;
+    populatePushBatchOptions();   // 营期候选项跟随弹窗自己的范围收缩
+  };
+  const fillLinks=()=>{
+    const p=fp.value; const ls=p?dataLinks(p):allLinks; const cur=fl.value;
+    fl.innerHTML='<option value="">请选择链路</option>'+ls.map(l=>'<option value="'+esc(l)+'">链路 '+esc(l)+'</option>').join('');
+    if(cur && ls.indexOf(cur)>=0) fl.value=cur;
+  };
+  fp.onchange=()=>{ fillLinks(); fillMonths(''); };
+  fl.onchange=()=>fillMonths('');
+  fc.onchange=()=>fillMonths('');
+  fillMonths(fm.value||state.month||'');
 }
 function populatePushBatchOptions(){
-  const sel=$('#pBatch'); if(!sel)return;
-  const rows=filteredRows();
+  const sel=$('#pBatch'); if(!sel) return;
+  /* 营期候选按「弹窗自己的」范围收缩（不再依赖顶部筛选，避免两者不一致） */
+  const gv=id=>{ const e=$(id); return e?e.value:''; };
+  const proj=gv('#pProject')||state.project, link=gv('#pLink')||state.link, cat=gv('#pCategory')||state.cat, mon=gv('#pMonth');
+  const rows=allData().filter(r=>(!proj||r._proj===proj)&&(!link||r._link===link)&&(!cat||r._cat===cat)&&(!mon||(r['月份']||'')===mon));
   const by={}; rows.forEach(r=>{ const b=r['营期数']||''; if(b) by[b]=1; });
-  const opts=Object.keys(by).sort();
-  sel.innerHTML='<option value="">全部营期</option>'+opts.map(b=>'<option value="'+b+'">'+b+'</option>').join('');
+  const opts=Object.keys(by).sort((a,b)=>(parseInt(a.replace(/[^0-9]/g,''),10)||0)-(parseInt(b.replace(/[^0-9]/g,''),10)||0));
+  const cur=sel.value;
+  sel.innerHTML='<option value="">全部营期</option>'+opts.map(b=>'<option value="'+esc(b)+'">'+esc(b)+'</option>').join('');
+  if(cur && opts.indexOf(cur)>=0) sel.value=cur;
 }
 async function openPushModal(){
   buildPushModal();
@@ -3820,82 +3836,116 @@ async function openPushModal(){
     category: state.cat||'', month: state.month||'',
     level: rankLevel, metric: rankMetric, batch: rankBatch||''
   };
-  setPushForm({...current, capture:'table', tier:'', topN:0, groupName:'', schedule:''});
-  pushMsg('正在读取本地推送服务配置…','info');
+  setPushForm({...current, tier:'', topN:10});
+  pushMsg('正在连接推送服务并读取群列表…','info');
+  await pLoadChats(false);
+}
+/* ============================================================
+   排名榜单推送（方案 B：内容由页面生成，服务只负责投递）
+   服务地址复用 pushBase()（LS: pushBase）；目标群来自 /chats
+   ============================================================ */
+function pMsg(html,type){ const el=$('#pPushMsg'); if(!el)return; el.className='push-msg '+(type||''); el.innerHTML=html; }
+async function pLoadChats(verbose){
+  const sel=$('#pGroup'); if(!sel) return;
   try{
-    const res=await fetch('http://127.0.0.1:8899/config',{method:'GET',mode:'cors'});
-    if(res.ok){
-      const saved=await res.json();
-      // 用当前页面状态打底，再用保存配置覆盖（保存配置含项目/链路/品类/月份）
-      setPushForm({...current, capture:'table', tier:'', topN:0, ...saved, ...current});
-      pushMsg('已加载本地保存配置；修改后点击「保存配置」或「立即推送」。','success');
-    } else { pushMsg('本地服务在线，但未返回配置。','info'); }
+    const r=await fetch(pushBase()+'/chats',{mode:'cors'});
+    const j=await r.json(); const list=(j&&j.chats)||[];
+    const keep=sel.value||LS.get('pushChat')||'';
+    if(list.length){
+      sel.innerHTML=list.map(c=>'<option value="'+esc(c.chatid)+'">'+esc(c.name||c.chatid)+(c.chattype==='single'?'（单聊）':'')+'</option>').join('');
+      if(keep && list.some(c=>c.chatid===keep)) sel.value=keep;
+      if(verbose) pMsg('✅ 已连接推送服务，共 '+list.length+' 个会话','success');
+    } else {
+      sel.innerHTML='<option value="">（服务在线，但暂无会话：请先在目标群 @一次机器人）</option>';
+      if(verbose) pMsg('⚠ 服务在线，但还没有会话——请先在目标群里 @一次机器人','err');
+    }
   }catch(e){
-    pushMsg('未检测到本地推送服务（http://127.0.0.1:8899）。<br>如需立即推送，请先运行：node push_server.js<br>或直接使用命令行：node push_leaderboard.js','warn');
+    sel.innerHTML='<option value="">（未连接推送服务）</option>';
+    if(verbose) pMsg('❌ 无法连接 '+esc(pushBase())+'<br>请先在本机运行 push_service/start_push.bat','err');
   }
 }
-async function savePushConfig(){
-  const cfg=getPushFormConfig();
-  if(!cfg.groupName){ pushMsg('请填写目标群名称','err'); return; }
+async function pTest(){
+  pMsg('正在发送测试…','info');
   try{
-    const res=await fetch('http://127.0.0.1:8899/save-config',{method:'POST',headers:{'Content-Type':'application/json'},mode:'cors',body:JSON.stringify(cfg)});
-    if(res.ok){
-      pushMsg('配置已保存到 push_config.json，定时任务将按此配置执行。','success');
-      downloadJson('push_config.json', JSON.stringify(cfg,null,2));
-    } else { pushMsg('保存失败：'+res.status,'err'); }
-  }catch(e){
-    // 服务未启动时，fallback 下载配置
-    downloadJson('push_config.json', JSON.stringify(cfg,null,2));
-    pushMsg('本地服务未启动，已下载 push_config.json；请将其放入项目目录后再运行推送。','warn');
-  }
+    const sel=$('#pGroup');
+    const r=await fetch(pushBase()+'/test',{method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({chatid:(sel&&sel.value)||''})});
+    const j=await r.json();
+    if(j.ok) pMsg('✅ 测试消息已发送到「'+esc((j.push&&j.push.chat_name)||'')+'」','success');
+    else pMsg('❌ '+(esc(j.error)||'发送失败'),'err');
+  }catch(e){ pMsg('❌ 无法连接推送服务：'+esc(e.message),'err'); }
 }
-async function downloadPushPreview(){
-  const cfg=getPushFormConfig();
-  if(!cfg.project || !cfg.link || !cfg.category || !cfg.month){ pushMsg('请先在上方选择 项目 / 链路 / 品类 / 月份','err'); return; }
-  pushMsg('正在渲染预览图…','info');
-  try{
-    const res=await fetch('http://127.0.0.1:8899/render',{method:'POST',headers:{'Content-Type':'application/json'},mode:'cors',body:JSON.stringify(cfg)});
-    if(!res.ok) throw new Error('服务返回 '+res.status);
-    const blob=await res.blob();
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a'); a.href=url;
-    a.download='rank_preview_'+new Date().toISOString().slice(0,10)+'.png';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),5000);
-    pushMsg('预览图已下载','success');
-  }catch(e){
-    pushMsg('预览图下载失败：'+e.message+'<br>建议运行：node push_server.js','err');
+/* 按弹窗配置算出与页面同一套排名（复用 aggMetrics + 头部20/中上30/中下30/尾部20 档位） */
+function rankItemsFor(cfg){
+  let rows=allData().filter(r=>(!cfg.project||r._proj===cfg.project)&&(!cfg.link||r._link===cfg.link)&&(!cfg.category||r._cat===cfg.category));
+  if(cfg.month) rows=rows.filter(r=>(r['月份']||'')===cfg.month);
+  const by={}; rows.forEach(r=>{ const b=r['营期数']||''; if(b)(by[b]=by[b]||[]).push(r); });
+  const bs=Object.keys(by).sort((a,b)=>(parseInt(a.replace(/[^0-9]/g,''),10)||0)-(parseInt(b.replace(/[^0-9]/g,''),10)||0));
+  const scope=cfg.batch? (by[cfg.batch]||[]) : rows;
+  let items=[];
+  if(cfg.level==='营期'){
+    const list=cfg.batch?[cfg.batch]:bs;
+    items=list.map(b=>({ name:b, m:aggMetrics(by[b]||[]) })).filter(x=>x.m.原始人数>0);
+  } else {
+    const seen={};
+    scope.forEach(r=>{ const k=r[cfg.level]||''; if(k && !seen[k]){ seen[k]=1; items.push({ name:k, m:aggMetrics(scope.filter(x=>(x[cfg.level]||'')===k)) }); } });
   }
+  const isRate=cfg.metric==='rate';
+  items.sort((a,b)=> isRate? (b.m.总尾款转化率-a.m.总尾款转化率) : (b.m.总产值-a.m.总产值));
+  const n=items.length;
+  const headN=Math.round(n*0.2), midHiN=Math.round(n*0.3), midLoN=Math.round(n*0.3);
+  const rangeOf=rank=> rank<=headN?'头部20%' : (rank<=headN+midHiN?'中上30%' : (rank<=headN+midHiN+midLoN?'中下30%':'尾部20%'));
+  let list=items.map((it,i)=>Object.assign({}, it, { rank:i+1, range:rangeOf(i+1) }));
+  const tierName={ head20:'头部20%', midHigh30:'中上30%', midLow30:'中下30%', tail20:'尾部20%' }[cfg.tier] || '';
+  if(tierName) list=list.filter(x=>x.range===tierName);
+  let limit=Number(cfg.topN)||0, note='';
+  if(limit<=0){ limit=20; note='仅列前 20 行，完整榜单见看板'; }
+  else if(limit>50){ limit=50; note='已限制最多 50 行'; }
+  const shown=list.slice(0,limit);
+  if(!note && list.length>shown.length) note='本条列前 '+shown.length+' 项';
+  return { list:shown, total:n, shownTotal:list.length, isRate:isRate, note:note, tierName:tierName };
+}
+function buildRankPushMarkdown(){
+  const cfg=getPushFormConfig();
+  const r=rankItemsFor(cfg);
+  const p=[];
+  p.push('## 元析智察 · 排名榜单（按'+(r.isRate?'转率':'产值')+'）');
+  p.push('**范围**：'+(cfg.project||'-')+' / '+(cfg.link||'-')+' / '+(cfg.category||'-')+' · '+(cfg.month||'全部月份')+' · '+(cfg.batch||'全部营期'));
+  p.push('**维度**：'+(cfg.level||'-')+(r.tierName?(' · 档位 '+r.tierName):'')+' · 共 '+r.total+' 项'+(r.note?(' · '+r.note):''));
+  p.push('');
+  p.push('| 排名 | '+(cfg.level||'名称')+' | 原始人数 | 总转率 | 总产值 |');
+  p.push('| --- | --- | --- | --- | --- |');
+  if(r.list.length){
+    r.list.forEach(x=>{ p.push('| '+x.rank+' | '+String(x.name).replace(/\|/g,'/')+' | '+fmt(x.m.原始人数,0)+' | '+fmtPct(x.m.总尾款转化率,1)+' | '+fmt(x.m.总产值,1)+' |'); });
+  } else {
+    p.push('| — | （无数据，请检查范围 / 营期） | — | — | — |');
+  }
+  p.push('');
+  p.push('> 档位：头部20% / 中上30% / 中下30% / 尾部20% · 总产值＝流水/原始人数×单产系数');
+  p.push('> 生成时间：'+new Date().toLocaleString('zh-CN'));
+  return p.join('\n');
 }
 async function pushNow(){
   const cfg=getPushFormConfig();
-  if(!cfg.project || !cfg.link || !cfg.category || !cfg.month){ pushMsg('请先在上方选择 项目 / 链路 / 品类 / 月份','err'); return; }
-  if(!cfg.groupName){ pushMsg('请填写目标群名称','err'); return; }
-  pushMsg('正在推送…','info');
+  if(!cfg.project || !cfg.link || !cfg.category){ pMsg('请先选择 项目 / 链路 / 品类','err'); return; }
+  if(!cfg.chatid){ pMsg('请先连接推送服务并选择目标群','err'); return; }
+  pMsg('正在推送榜单…','info');
   try{
-    const res=await fetch('http://127.0.0.1:8899/push',{method:'POST',headers:{'Content-Type':'application/json'},mode:'cors',body:JSON.stringify(cfg)});
+    const content=buildRankPushMarkdown();
+    const res=await fetch(pushBase()+'/push',{method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({ chatid:cfg.chatid, content:content })});
     const data=await res.json();
     if(data.ok){
-      pushMsg('推送成功！已发送至「'+data.push.chat_name+'」','success');
+      const nm=(data.push&&data.push.chat_name)||cfg.chatid;
+      pMsg('✅ 已推送到「'+esc(nm)+'」（'+((data.push&&data.push.bytes)||content.length)+' 字节）','success');
+      auditLog('企微推送','排名榜单 → '+nm);
     } else {
-      let html='推送未成功：'+data.error;
-      if(data.code===850002 && data.help_message){
-        html+='<br><b>缺少消息权限：</b>请让机器人创建者点击技能返回的授权链接授权后重试。';
-      }
-      pushMsg(html,'err');
+      let html='❌ 推送失败：'+esc(data.error||'未知错误');
+      if(data.code) html+='（errcode '+data.code+'）';
+      if(data.code===850002) html+='<br><b>缺少消息权限：</b>请让机器人在该会话中先收到过用户消息。';
+      pMsg(html,'err');
     }
   }catch(e){
-    const cmd='node push_leaderboard.js --level='+cfg.level+' --metric='+cfg.metric+' --group="'+cfg.groupName+'"';
-    pushMsg('无法连接本地推送服务，请复制下方命令到终端运行：<br><code>'+cmd+'</code>','warn');
-    if(navigator.clipboard) navigator.clipboard.writeText(cmd);
+    pMsg('❌ 无法连接推送服务：'+esc(e.message)+'<br>请确认本机已运行 push_service/start_push.bat','err');
   }
-}
-function downloadJson(name, content){
-  const blob=new Blob([content],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download=name;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),3000);
 }
 
 /* ============================================================
@@ -4668,6 +4718,7 @@ function renderStageCfg(){
    ============================================================ */
 function renderAlert(){
   renderStageCfg();   // 配置器为全局设置，始终渲染（不依赖筛选）
+  renderPushCard();   // 企微推送卡（服务地址/目标群/发送），同样不依赖筛选
   // 需先选满 项目/链路/品类/月份
   if(!monthlyEnabled()){
     setFilterEmpty(['#alertZone','#alActSumTable','#alActDayTable','#alDoneSumTable','#alDoneDayTable'], '预警洞察',
@@ -4695,21 +4746,138 @@ function renderAlert(){
   // ===== 目标转率设置 =====
   renderAlTarget(active);
   // 推送按钮
-  const p1=$('#alActPush'); if(p1) p1.onclick=()=>{ pushAlertNow(alActDim,'rate'); };
-  const p2=$('#alDonePush'); if(p2) p2.onclick=()=>{ pushAlertNow(alDoneDim,'rate'); };
-  const p3=$('#alTestPush'); if(p3) p3.onclick=alTestPush;
+  // 「📤 推送企微」按钮统一走真实推送（内容 = 当前筛选范围的预警日报）
+  const p1=$('#alActPush'); if(p1) p1.onclick=alPushSend;
+  const p2=$('#alDonePush'); if(p2) p2.onclick=alPushSend;
   // 实时异常/定时月报推送卡（swPush/swReport/webhookUrl/threshold/testPush 属本模块模板；原绑定误写在 renderSettings 导致其抛异常，已移回本处）
   const sp2=$('#swPush'); if(sp2){ sp2.className='switch'+(config.pushOn?' on':''); sp2.onclick=()=>{ config.pushOn=!config.pushOn; saveCfg(); sp2.className='switch'+(config.pushOn?' on':''); }; }
   const sr2=$('#swReport'); if(sr2){ sr2.className='switch'+(config.reportOn?' on':''); sr2.onclick=()=>{ config.reportOn=!config.reportOn; saveCfg(); sr2.className='switch'+(config.reportOn?' on':''); }; }
   const wu2=$('#webhookUrl'); if(wu2) wu2.value=config.webhook||'';
   const th2=$('#threshold'); if(th2) th2.value=config.threshold;
   const tp2=$('#testPush'); if(tp2) tp2.onclick=testPush;
-  $('#alGroup').value=LS.get('alGroup')||'推送测试';
-  $('#alTime').value=LS.get('alTime')||'09:00';
-  const sw=$('#swAlPush'); if(sw){ const on=LS.get('alPushOn')!=='0'; sw.className='switch'+(on?' on':''); sw.onclick=()=>{ const n=sw.className.indexOf('on')>=0; sw.className='switch'+(n?'':' on'); LS.set('alPushOn',n?'0':'1'); toast(n?'已关闭每日推送':'已开启每日推送'); }; }
   $('#alReport').onclick=genAlertReport;
   $('#alRefresh').onclick=()=>{ renderAlert(); toast('已刷新预警检测'); };
 }
+/* ============================================================
+   企微推送 · 对接本地 push_service（方案 A：内容由页面生成）
+   ------------------------------------------------------------
+   服务地址可配置（LS: pushBase，默认 http://127.0.0.1:8899）
+   目标群从服务 /chats 拉取（LS: pushChat 记住所选 chatid）
+   ============================================================ */
+function pushBase(){ return String(LS.get('pushBase')||'http://127.0.0.1:8899').replace(/\/+$/,''); }
+function setPushMsg(html,lv){
+  const el=$('#alPushMsg'); if(!el) return;
+  const color = lv==='err' ? '#fca5a5' : (lv==='success' ? '#6ee7b7' : 'var(--dim)');
+  el.innerHTML='<span style="color:'+color+'">'+html+'</span>';
+}
+/* 首次进入时把旧「企业微信推送」卡改造成可用控件（运行时重建，避免改模板转义） */
+function renderPushCard(){
+  let card=$('#alPushCard');
+  if(!card){ const old=$('#alGroup'); if(old){ card=old.closest('.card'); if(card) card.id='alPushCard'; } }
+  if(!card) return;
+  if(!$('#alPushChat')){
+    card.innerHTML =
+      '<div class="card-t"><h3>企业微信推送</h3><span class="sub" id="alPushSub">连接本地推送服务后即可发送</span><span class="spacer"></span><button class="btn sm" id="alPushReload">检测服务 / 刷新群</button></div>'
+      +'<div class="field"><label>推送服务地址</label><input id="alPushBase" placeholder="http://127.0.0.1:8899"></div>'
+      +'<div class="field"><label>目标群</label><select id="alPushChat"><option value="">（未连接推送服务）</option></select></div>'
+      +'<div style="display:flex;gap:8px;margin-top:10px">'
+      +'<button class="btn" id="alPushTest" style="flex:1;justify-content:center">发送测试</button>'
+      +'<button class="btn pri" id="alPushSend" style="flex:2;justify-content:center">📤 推送当前预警到群</button>'
+      +'</div>'
+      +'<div id="alPushMsg" style="font-size:12px;margin-top:8px;line-height:1.7"></div>';
+  }
+  const base=$('#alPushBase');
+  if(base){ base.value=LS.get('pushBase')||'http://127.0.0.1:8899'; base.onchange=()=>{ LS.set('pushBase',base.value.trim()); alPushLoadChats(true); }; }
+  const rl=$('#alPushReload'); if(rl) rl.onclick=()=>alPushLoadChats(true);
+  const ts=$('#alPushTest'); if(ts) ts.onclick=alPushTest;
+  const sd=$('#alPushSend'); if(sd) sd.onclick=alPushSend;
+  alPushLoadChats(false);   // 静默探测一次（失败不打扰）
+}
+/* 拉取已知会话（群/单聊）→ 填目标群下拉 */
+async function alPushLoadChats(verbose){
+  const sel=$('#alPushChat'); if(!sel) return;
+  const sub=$('#alPushSub');
+  try{
+    const r=await fetch(pushBase()+'/chats',{mode:'cors'});
+    const j=await r.json();
+    const list=(j&&j.chats)||[];
+    const keep=LS.get('pushChat')||sel.value;
+    if(list.length){
+      sel.innerHTML=list.map(c=>'<option value="'+esc(c.chatid)+'">'+esc(c.name||c.chatid)+(c.chattype==='single'?'（单聊）':'')+'</option>').join('');
+      if(keep && list.some(c=>c.chatid===keep)) sel.value=keep;
+      LS.set('pushChat',sel.value);
+      if(sub) sub.textContent='服务已连接 · 已知会话 '+list.length+' 个';
+      if(verbose) setPushMsg('✅ 已连接推送服务，刷新到 '+list.length+' 个会话','success');
+    } else {
+      sel.innerHTML='<option value="">（服务在线，但暂无会话：请先在目标群里 @一次机器人）</option>';
+      if(sub) sub.textContent='服务已连接 · 尚无会话';
+      if(verbose) setPushMsg('⚠ 服务在线，但还没有会话——请先在目标群里 @一次机器人','err');
+    }
+    sel.onchange=()=>LS.set('pushChat',sel.value);
+  }catch(e){
+    sel.innerHTML='<option value="">（未连接推送服务）</option>';
+    if(sub) sub.textContent='未检测到推送服务（'+pushBase()+'）';
+    if(verbose) setPushMsg('❌ 无法连接 '+pushBase()+'<br>请先在本机运行 push_service/start_push.bat','err');
+  }
+}
+/* 生成推送内容（markdown）＝ 当前筛选范围的核心指标 + 预警清单 */
+function buildPushMarkdown(){
+  const rows=filteredRows();
+  const m=aggMetrics(rows);
+  const alerts=buildAlerts(rows);
+  const p=[];
+  p.push('## 元析智察 · 转化日报');
+  p.push('**范围**：'+(state.project||'-')+' / '+(state.link||'-')+' / '+(isAllCat()?'全部品类':catName(state.cat))+' · '+fmtScope());
+  p.push('');
+  p.push('**核心指标**');
+  p.push('> 总原始人数：**'+fmt(m.原始人数,0)+'**');
+  p.push('> 总尾款转化率：**'+fmtPct(m.总尾款转化率,1)+'**');
+  p.push('> 总产值：**'+fmt(m.总产值,1)+'**');
+  p.push('> 总流水：**'+fmtMoney(m.总流水)+'**');
+  if(state.cat==='大课数据' && m.定金日维度){
+    p.push('> 定金转化率：首日 **'+fmtPct(m.定金首日转率,1)+'** → 首周 **'+fmtPct(m.定金首周转率,1)+'**');
+    p.push('> 定金追回率：首日 **'+fmtPct(m.定金首日追回率,1)+'** → 首周 **'+fmtPct(m.定金首周追回率,1)+'**');
+  }
+  p.push('');
+  p.push('**风险预警（'+alerts.length+' 条）**');
+  if(!alerts.length){ p.push('> ✅ 当前范围无触发预警'); }
+  else {
+    alerts.slice(0,8).forEach(a=>{
+      p.push((a.lv==='red'?'🔴':(a.lv==='yellow'?'🟡':'🔵'))+' **'+a.t+'**');
+      p.push('　'+a.s);
+      p.push('');
+    });
+    if(alerts.length>8) p.push('> …另有 '+(alerts.length-8)+' 条，详见看板');
+  }
+  p.push('');
+  p.push('> 生成时间：'+new Date().toLocaleString('zh-CN'));
+  return p.join('\n');
+}
+/* 发送：内容由页面生成，服务只负责投递 */
+async function alPushSend(){
+  const sel=$('#alPushChat');
+  const chatid=sel?sel.value:'';
+  if(!chatid){ setPushMsg('⚠ 请先连接推送服务并选择目标群（右侧「检测服务 / 刷新群」）','err'); return; }
+  if(!monthlyEnabled()){ setPushMsg('⚠ 请先选择完整的 项目 / 链路 / 品类','err'); return; }
+  setPushMsg('正在推送…');
+  try{
+    const r=await fetch(pushBase()+'/push',{method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({chatid:chatid,content:buildPushMarkdown()})});
+    const j=await r.json();
+    if(j.ok){ setPushMsg('✅ 已推送到「'+((j.push&&j.push.chat_name)||chatid)+'」','success'); auditLog('企微推送','预警日报 → '+((j.push&&j.push.chat_name)||chatid)); }
+    else setPushMsg('❌ 推送失败：'+esc(j.error||'未知错误')+(j.code?('（errcode '+j.code+'）'):''),'err');
+  }catch(e){ setPushMsg('❌ 无法连接推送服务：'+esc(e.message)+'<br>请确认本机已运行 push_service/start_push.bat','err'); }
+}
+async function alPushTest(){
+  setPushMsg('正在发送测试…');
+  try{
+    const sel=$('#alPushChat');
+    const r=await fetch(pushBase()+'/test',{method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({chatid:(sel&&sel.value)||''})});
+    const j=await r.json();
+    if(j.ok) setPushMsg('✅ 测试消息已发送到「'+esc((j.push&&j.push.chat_name)||'')+'」','success');
+    else setPushMsg('❌ '+(esc(j.error)||'发送失败'),'err');
+  }catch(e){ setPushMsg('❌ 无法连接推送服务：'+esc(e.message),'err'); }
+}
+
 /* 维度/指标 seg 绑定 */
 function bindAlSeg(el,key,fn){
   if(!el) return;
@@ -4886,26 +5054,6 @@ function renderAlTarget(active){
     for(let d=1;d<=7;d++){ const tg=s['D'+d]; if(!tg) continue; const v=p?sum(rr,r=>r['D'+d+'转化人数'])/p:0; if(v>0&&v<tg/100) overdue.push({b,d,v,tg}); } });
   if(overdue.length) msg.innerHTML='<span style="color:#fbbf24">⚠ '+overdue.length+' 个目标未达标：'+overdue.map(o=>o.b+' D'+o.d+' '+fmtPct(o.v,1)+'<'+o.tg+'%').join('；')+'（每日 22:00 自动推送提醒）</span>';
   else msg.innerHTML='<span style="color:#6ee7b7">✓ 当前所有已设置目标均达标</span>';
-}
-/* 立即推送当前视图（走本地 push_server；仅汇总，按营期拆图） */
-async function pushAlertNow(dim,metric){
-  const group=$('#alGroup').value||'推送测试';
-  pushMsg('正在渲染预警汇总视图并按营期拆分推送…','info');
-  try{
-    const cfg={ view:'alert', project:state.project||'', link:state.link||'', category:state.cat||'', month:state.month||'', alertDim:dim, alertMetric:metric, alertPart:'sum', groupName:group };
-    const res=await fetch('http://127.0.0.1:8899/push',{method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(cfg)});
-    const j=await res.json();
-    if(j.ok) pushMsg('✅ 已推送到企微群「'+group+'」（'+((j.push&&j.push.chat_name)||group)+'）','success');
-    else if(j.stage==='auth') pushMsg('渲染成功，但发送需授权：'+ (j.error||'') ,'err');
-    else pushMsg('推送失败：'+(j.error||'')+'','err');
-  }catch(e){ pushMsg('本地推送服务未运行（node push_server.js）','warn'); }
-}
-function alTestPush(){
-  const group=$('#alGroup').value||'推送测试';
-  pushMsg('测试推送：正在发送到「'+group+'」…','info');
-  fetch('http://127.0.0.1:8899/push',{method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({view:'alert',project:state.project||'',link:state.link||'',category:state.cat||'',month:state.month||'',alertDim:alActDim,alertMetric:alActMetric,alertPart:'sum',groupName:group})})
-    .then(r=>r.json()).then(j=>{ if(j.ok) pushMsg('✅ 测试推送成功','success'); else pushMsg('测试推送失败：'+(j.error||'')+(j.stage==='auth'?'（需授权）':''),'err'); })
-    .catch(()=>pushMsg('本地推送服务未运行','warn'));
 }
 window.__genAlertConclusion=function(batchFilter){
   const all=filteredRows();
