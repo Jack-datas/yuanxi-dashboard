@@ -5198,7 +5198,7 @@ function alSumCols(cat){
   return cols;
 }
 /* 一组分节（同一负责人 / 或全合并）→ 一张 PNG */
-function alPushImageDataUrl(sections, cat, panel, titleOwner){
+function alPushImageDataUrl(sections, cat, panel, titleLabel){
   const model=alPushImageModel(sections, cat);
   const hasDeposit=(cat==='大课数据');
   const FONT='"Microsoft YaHei","PingFang SC",-apple-system,sans-serif';
@@ -5220,7 +5220,7 @@ function alPushImageDataUrl(sections, cat, panel, titleOwner){
   g.fillStyle=grad; g.fillRect(0,0,W,titleH);
   g.textAlign='left'; g.fillStyle='#ffffff';
   g.font='bold 26px '+FONT;
-  g.fillText('元析智察 · '+(panel==='act'?'转化中营期':'已结束营期')+'汇总数据'+(titleOwner?(' · 负责人 '+titleOwner):''), padX, 46);
+  g.fillText('元析智察 · '+(panel==='act'?'转化中营期':'已结束营期')+'汇总数据'+(titleLabel?(' · '+titleLabel):''), padX, 46);
   g.font='14px '+FONT; g.globalAlpha=0.94;
   g.fillText((state.project||'-')+' / '+(state.link||'-')+' / '+(isAllCat()?'全部品类':catName(state.cat)), padX, 76);
   g.fillText('营期：'+distinct(sections,r=>r.batch).join('、')+'　·　本文 '+model.length+' 节（负责人 × 营期）', padX, 102);
@@ -5312,6 +5312,61 @@ function alNameHit(r,nf){
 }
 /* 简要文字分析（markdown）：核心指标 + 与其余营期对比 + 节奏/定金看点 + 预警
    ★ scopeRows 必须是「本次播报范围」的原始行（= 被拆图推送的那些营期），不能直接用整个面板范围 */
+/* 单个营期的表现描述（多营期播报时逐期展开）
+   ★ 基准口径：转化中 → 已结束营期「同 Day 累计」均值（与进度预警同口径）；
+                已结束 → 其余营期「全期」均值。 */
+function alBatchBlock(panel, b, bRows, allRows, cat){
+  if(!bRows || !bRows.length) return [];
+  const isAct=panel==='act';
+  const am=aggMetrics(bRows);
+  const sd=stageDay(bRows[0]);
+  const L=[];
+  const tag=(isAct && sd!=null && !isStageEnded(bRows[0]))? ('Day '+sd) : '已结束';
+  L.push('▎**'+b+'**（'+tag+'）');
+  L.push('　进量 **'+fmt(am.原始人数,0)+'** 人　单数 **'+fmt(am.总单数,0)+'**　尾款转率 **'+fmtPct(am.总尾款转化率,1)+'**　人均产值 **'+fmt(am.总产值,1)+'**');
+  const cmp=[];
+  if(isAct && sd!=null){
+    const done=allRows.filter(r=>isStageEnded(r));
+    if(done.length){
+      const d=Math.max(1,Math.min(sd,14));
+      const pD=sum(done,r=>r['原始人数']), kD=priceK(done);
+      const bR=cumRate(done,d), bV=pD? cumFlow(done,d)/pD*kD : 0;
+      const cR=cumRate(bRows,d), cV=am.原始人数? cumFlow(bRows,d)/am.原始人数*priceK(bRows) : 0;
+      const nDone=distinct(done,r=>r['营期数']).length;
+      const dCap=(sd>d)||(sd>14);
+      cmp.push('对比已结束 '+nDone+' 期'+(dCap? (' D'+d+' 累计均值（本期 Day '+sd+' 已超分日范围，按 D14 比）') : ('同为 D'+d+' 的累计均值'))+' '+fmtPct(bR,1)+'：转率 **'+(cR>=bR?'▲ +':'▼ ')+fmt(Math.abs(cR-bR)*100,1)+'pt**');
+      if(bV) cmp.push('人均累计产值 **'+fmt(cV,1)+'** vs '+fmt(bV,1)+' → **'+(cV>=bV?'▲ +':'▼ ')+fmt(Math.abs(cV-bV)/bV*100,1)+'%**');
+    }
+  } else {
+    const others=allRows.filter(r=>r['营期数']!==b);
+    if(others.length){
+      const o=aggMetrics(others); const nO=distinct(others,r=>r['营期数']).length;
+      const dr=(am.总尾款转化率-o.总尾款转化率)*100;
+      cmp.push('对比其余 '+nO+' 期全期均值（'+fmtPct(o.总尾款转化率,1)+'）：转率 **'+(dr>=0?'▲ +':'▼ ')+fmt(Math.abs(dr),1)+'pt**');
+      if(o.总产值) cmp.push('人均产值 **'+fmt(am.总产值,1)+'** vs '+fmt(o.总产值,1)+' → **'+(am.总产值>=o.总产值?'▲ +':'▼ ')+fmt(Math.abs(am.总产值-o.总产值)/o.总产值*100,1)+'%**');
+    }
+  }
+  if(cmp.length) L.push('　'+cmp.join('　·　'));
+  L.push('　节奏 1日 '+fmtPct(am['首日转率'],1)+' → 3日 '+fmtPct(am['3日转率'],1)+' → 7日 '+fmtPct(am['7日转率'],1));
+  if(cat==='大课数据' && am.定金日维度){
+    L.push('　定金 首日 '+fmtPct(am.定金首日转率,1)+' → 首周 '+fmtPct(am.定金首周转率,1)
+      +'　｜　追回 首日 '+fmtPct(am.定金首日追回率,1)+' → 首周 '+fmtPct(am.定金首周追回率,1));
+  }
+  const cCol=dimColOf('教练');
+  const cns=distinct(bRows.filter(r=>(r[cCol]||'')!==''), r=>r[cCol]);
+  if(cns.length>1){
+    const arr=cns.map(n=>({ n:n, v:aggMetrics(bRows.filter(r=>r[cCol]===n)).总尾款转化率 })).sort((x,y)=>y.v-x.v);
+    const t=arr[0], bo=arr[arr.length-1];
+    L.push('　教练头尾 '+t.n+' '+fmtPct(t.v,1)+' ／ '+bo.n+' '+fmtPct(bo.v,1)+'（差 '+fmt((t.v-bo.v)*100,1)+'pt）');
+  }
+  const nAl=buildAlerts(bRows).length;
+  if(nAl) L.push('　⚠ **'+nAl+'** 条预警');
+  L.push('');
+  return L;
+}
+/* 推送文字分析（markdown）
+   ★ 多营期：**逐期展开**（每期一段，含自身基准对比/节奏/定金/教练头尾），末尾给横向对比，不再只报聚合值。
+   ★ 单营期：保留「核心指标 + 同 Day 对比 + 头尾」的原有写法。 */
 function buildAlSummaryPushMarkdown(panel, groups, scopeRows, allRows, order){
   const isAct = panel==='act';
   const cat=state.cat||'';
@@ -5320,49 +5375,63 @@ function buildAlSummaryPushMarkdown(panel, groups, scopeRows, allRows, order){
   p.push('## 元析智察 · '+(isAct?'转化中营期':'已结束营期')+'数据播报');
   p.push('**范围**：'+(state.project||'-')+' / '+(state.link||'-')+' / '+(isAllCat()?'全部品类':catName(state.cat))+' · 营期 '+(order.join('、')));
   p.push('');
-  p.push('**核心指标**（本次播报 '+order.length+' 个营期）');
-  p.push('> 总原始人数：**'+fmt(m.原始人数,0)+'**　总单数：**'+fmt(m.总单数,0)+'**');
-  p.push('> 总尾款转化率：**'+fmtPct(m.总尾款转化率,1)+'**');
-  p.push('> 总产值（人均）：**'+fmt(m.总产值,1)+'**');
-  p.push('> 节奏：1日 **'+fmtPct(m['首日转率'],1)+'** → 3日 **'+fmtPct(m['3日转率'],1)+'** → 7日 **'+fmtPct(m['7日转率'],1)+'**');
-  if(cat==='大课数据' && m.定金日维度){
-    p.push('> 定金转化率：首日 **'+fmtPct(m.定金首日转率,1)+'** → 首周 **'+fmtPct(m.定金首周转率,1)+'**');
-    p.push('> 定金追回率：首日 **'+fmtPct(m.定金首日追回率,1)+'** → 首周 **'+fmtPct(m.定金首周追回率,1)+'**');
-  }
-  p.push('');
-  p.push('**简要分析**');
-  const sd=stageDay(scopeRows[0]);
-  const nb=distinct(scopeRows,r=>r['营期数']).length;
-  p.push('· 本次覆盖 '+nb+' 个营期、'+distinct(scopeRows,r=>r['教练']).length+' 名教练'+(nb===1&&sd!=null?('，'+order[0]+' 当前处于 Day '+sd):'')+'。');
-  // ★ 对比基准：单营期且为「转化中」→ 已结束营期「同 Day 累计」均值（与页面的进度预警同口径）；
-  //   否则（已结束营期 / 多营期）→ 其余营期全期均值。避免「Day6 的在跑营期 vs 已完结营期终值」这种错位对比。
-  const doneRows=allRows.filter(r=>isStageEnded(r));
-  const useSameDay = isAct && order.length===1 && sd!=null && doneRows.length>0;
-  if(useSameDay){
-    const d=Math.max(1,Math.min(sd,14));
-    const pD=sum(doneRows,r=>r['原始人数']), kD=priceK(doneRows);
-    const bRate=cumRate(doneRows,d), bVal=pD? cumFlow(doneRows,d)/pD*kD : 0;
-    const cRate=cumRate(scopeRows,d), cVal=m.原始人数? cumFlow(scopeRows,d)/m.原始人数*priceK(scopeRows) : 0;
-    const nDone=distinct(doneRows,r=>r['营期数']).length;
-    const dr=(cRate-bRate)*100;
-    p.push('· 同 Day 对比（截至 D'+d+'）：累计转率 **'+fmtPct(cRate,1)+'**，对比已结束营期（'+nDone+' 个）同 Day 均值 '+fmtPct(bRate,1)+' → **'+(dr>=0?'高于 ':'低于 ')+fmt(Math.abs(dr),1)+'pt**。');
-    if(bVal) p.push('· 人均累计产值（截至 D'+d+'）：**'+fmt(cVal,1)+'**，对比已结束营期同 Day 均值 '+fmt(bVal,1)+' → **'+(cVal>=bVal?'高 ':'低 ')+fmt(Math.abs(cVal-bVal)/bVal*100,1)+'%**。');
-  } else {
-    const others=allRows.filter(r=>order.indexOf(r['营期数'])<0);
-    if(others.length){
-      const b=aggMetrics(others); const nO=distinct(others,r=>r['营期数']).length;
-      const dr=(m.总尾款转化率-b.总尾款转化率)*100;
-      p.push('· 尾款转率对比其余 '+nO+' 个营期全期均值（'+fmtPct(b.总尾款转化率,1)+'）：**'+(dr>=0?'高于 ':'低于 ')+fmt(Math.abs(dr),1)+'pt**'+(dr<0?'，需重点盯单':'，转化表现偏强')+'。');
-      if(b.总产值){
-        const dv=(m.总产值-b.总产值)/b.总产值*100;
-        p.push('· 人均产值对比其余营期全期均值（'+fmt(b.总产值,1)+'）：**'+(dv>=0?'高 ':'低 ')+fmt(Math.abs(dv),1)+'%**'+(dv<0?'，建议核查直播/私聊配比':'，产值效率良好')+'。');
-      }
-    } else {
-      p.push('· 当前筛选范围内仅此营期，暂无同期可比基准。');
+  if(order.length>1){
+    // ===== 多营期：逐期展开 =====
+    p.push('**总体（'+order.length+' 期合计）**');
+    p.push('> 进量 **'+fmt(m.原始人数,0)+'** 人　单数 **'+fmt(m.总单数,0)+'**　尾款转率 **'+fmtPct(m.总尾款转化率,1)+'**　人均产值 **'+fmt(m.总产值,1)+'**');
+    p.push('');
+    p.push('**各营期表现**');
+    order.forEach(b=>{ alBatchBlock(panel, b, scopeRows.filter(r=>r['营期数']===b), allRows, cat).forEach(l=>p.push(l)); });
+    const rows=order.map(b=>{ const a=aggMetrics(scopeRows.filter(r=>r['营期数']===b)); return { b:b, rate:a.总尾款转化率, val:a.总产值 }; });
+    if(rows.length>1){
+      const br=rows.slice().sort((x,y)=>y.rate-x.rate)[0];
+      const bv=rows.slice().sort((x,y)=>y.val-x.val)[0];
+      const ws=rows.slice().sort((x,y)=>x.rate-y.rate)[0];
+      p.push('**横向对比**：转率最高 **'+br.b+'**（'+fmtPct(br.rate,1)+'），最低 **'+ws.b+'**（'+fmtPct(ws.rate,1)+'），差 '+fmt((br.rate-ws.rate)*100,1)+'pt；人均产值最高 **'+bv.b+'**（'+fmt(bv.val,1)+'）。');
+      p.push('');
     }
-  }
-  // 单营期：点名负责人/教练层面的头尾（多营期时不适用）
-  if(order.length===1){
+  } else {
+    // ===== 单营期：保持原有写法 =====
+    p.push('**核心指标**');
+    p.push('> 总原始人数：**'+fmt(m.原始人数,0)+'**　总单数：**'+fmt(m.总单数,0)+'**');
+    p.push('> 总尾款转化率：**'+fmtPct(m.总尾款转化率,1)+'**');
+    p.push('> 总产值（人均）：**'+fmt(m.总产值,1)+'**');
+    p.push('> 节奏：1日 **'+fmtPct(m['首日转率'],1)+'** → 3日 **'+fmtPct(m['3日转率'],1)+'** → 7日 **'+fmtPct(m['7日转率'],1)+'**');
+    if(cat==='大课数据' && m.定金日维度){
+      p.push('> 定金转化率：首日 **'+fmtPct(m.定金首日转率,1)+'** → 首周 **'+fmtPct(m.定金首周转率,1)+'**');
+      p.push('> 定金追回率：首日 **'+fmtPct(m.定金首日追回率,1)+'** → 首周 **'+fmtPct(m.定金首周追回率,1)+'**');
+    }
+    p.push('');
+    p.push('**简要分析**');
+    const sd=stageDay(scopeRows[0]);
+    const nb=distinct(scopeRows,r=>r['营期数']).length;
+    p.push('· 本次覆盖 '+nb+' 个营期、'+distinct(scopeRows,r=>r['教练']).length+' 名教练'+(nb===1&&sd!=null?('，'+order[0]+' 当前处于 Day '+sd):'')+'。');
+    const doneRows=allRows.filter(r=>isStageEnded(r));
+    const useSameDay = isAct && sd!=null && doneRows.length>0;
+    if(useSameDay){
+      const d=Math.max(1,Math.min(sd,14));
+      const pD=sum(doneRows,r=>r['原始人数']), kD=priceK(doneRows);
+      const bRate=cumRate(doneRows,d), bVal=pD? cumFlow(doneRows,d)/pD*kD : 0;
+      const cRate=cumRate(scopeRows,d), cVal=m.原始人数? cumFlow(scopeRows,d)/m.原始人数*priceK(scopeRows) : 0;
+      const nDone=distinct(doneRows,r=>r['营期数']).length;
+      const dr=(cRate-bRate)*100;
+      const dCap2=(sd>d)||(sd>14);
+      p.push('· 对比已结束营期（'+nDone+' 个）'+(dCap2? ('D'+d+' 累计均值（本期 Day '+sd+' 已超分日范围）') : ('同为 D'+d+' 的累计均值'))+'：累计转率 **'+fmtPct(cRate,1)+'** vs '+fmtPct(bRate,1)+' → **'+(dr>=0?'高于 ':'低于 ')+fmt(Math.abs(dr),1)+'pt**。');
+      if(bVal) p.push('· 人均累计产值（截至 D'+d+'）：**'+fmt(cVal,1)+'**，对比已结束营期同 Day 均值 '+fmt(bVal,1)+' → **'+(cVal>=bVal?'高 ':'低 ')+fmt(Math.abs(cVal-bVal)/bVal*100,1)+'%**。');
+    } else {
+      const others=allRows.filter(r=>order.indexOf(r['营期数'])<0);
+      if(others.length){
+        const b=aggMetrics(others); const nO=distinct(others,r=>r['营期数']).length;
+        const dr=(m.总尾款转化率-b.总尾款转化率)*100;
+        p.push('· 尾款转率对比其余 '+nO+' 个营期全期均值（'+fmtPct(b.总尾款转化率,1)+'）：**'+(dr>=0?'高于 ':'低于 ')+fmt(Math.abs(dr),1)+'pt**'+(dr<0?'，需重点盯单':'，转化表现偏强')+'。');
+        if(b.总产值){
+          const dv=(m.总产值-b.总产值)/b.总产值*100;
+          p.push('· 人均产值对比其余营期全期均值（'+fmt(b.总产值,1)+'）：**'+(dv>=0?'高 ':'低 ')+fmt(Math.abs(dv),1)+'%**'+(dv<0?'，建议核查直播/私聊配比':'，产值效率良好')+'。');
+        }
+      } else {
+        p.push('· 当前筛选范围内仅此营期，暂无同期可比基准。');
+      }
+    }
     [OWNER,'教练'].forEach(d0=>{
       const arr=groups.filter(x=>x.dim===d0);
       if(arr.length<2) return;
@@ -5370,10 +5439,10 @@ function buildAlSummaryPushMarkdown(panel, groups, scopeRows, allRows, order){
       const top=sorted[0], bot=sorted[sorted.length-1];
       p.push('· '+d0+'层面：'+top.n+' 转率最高（'+fmtPct(top.v,1)+'），'+bot.n+' 最低（'+fmtPct(bot.v,1)+'），头尾差 '+fmt((top.v-bot.v)*100,1)+'pt。');
     });
+    const alerts=buildAlerts(scopeRows);
+    p.push('· 风险提示：本范围共 **'+alerts.length+'** 条预警'+(alerts.length?('（'+alerts.slice(0,2).map(a=>a.t).join('；')+'）'):'，暂无异常')+'。');
+    p.push('');
   }
-  const alerts=buildAlerts(scopeRows);
-  p.push('· 风险提示：本范围共 **'+alerts.length+'** 条预警'+(alerts.length?('（'+alerts.slice(0,2).map(a=>a.t).join('；')+'）'):'，暂无异常')+'。');
-  p.push('');
   p.push('> 生成时间：'+new Date().toLocaleString('zh-CN'));
   return p.join('\n');
 }
@@ -5382,7 +5451,8 @@ function buildAlSummaryPushMarkdown(panel, groups, scopeRows, allRows, order){
    ------------------------------------------------------------
    点击「推送企微」→ 打开推送设置弹窗 → 确认后：
      ① 按 (负责人 × 营期) 分节；
-     ② 按负责人拆图（每人 1 张，图内按营期分节）/ 或合并为一张；
+     ② 拆分方式：按负责人拆图（每人 1 张）/ 按营期拆图（每期 1 张）/ 合并为一张；
+        三者都是「同一批 sections（负责人 × 营期）」按不同键分组，图内一律按节渲染；
      ③ 逐张 POST /push-image（间隔 1.2s 限速）；
      ④ 末尾补一条 markdown 文字分析。
    范围默认「自动 = 阶段最小 Day 的营期」，可手动勾选覆盖。
@@ -5426,7 +5496,8 @@ function alPushSummary(panel){
       +'</div>'
     +'<div class="field"><label>拆分方式</label><div class="seg" id="puSplit">'
       +'<button class="btn sm'+(cfg.split==='owner'?' on':'')+'" data-v="owner">按负责人拆图</button>'
-      +'<button class="btn sm'+(cfg.split==='owner'?'':' on')+'" data-v="all">合并为一张</button></div></div>'
+      +'<button class="btn sm'+(cfg.split==='batch'?' on':'')+'" data-v="batch">按营期拆图</button>'
+      +'<button class="btn sm'+((cfg.split==='owner'||cfg.split==='batch')?'':' on')+'" data-v="all">合并为一张</button></div></div>'
     +'<div class="field"><label>层级范围</label><div class="seg" id="puDepth">'
       +'<button class="btn sm'+(cfg.depth==='bench'?'':' on')+'" data-v="full">含 经理/主管/组长/教练</button>'
       +'<button class="btn sm'+(cfg.depth==='bench'?' on':'')+'" data-v="bench">仅负责人大盘</button></div></div>'
@@ -5457,10 +5528,11 @@ function alPushSummary(panel){
     const rs=scope.filter(r=>bs.indexOf(r['营期数'])>=0);
     const owners=distinct(rs,r=>r[dimColOf(OWNER)]).filter(x=>x);
     const nOwn=Math.max(owners.length,1), nB=bs.length;
-    const nImg=(cfg.split==='owner')? nOwn : 1;
-    const nSec=(cfg.split==='owner')? nB*nOwn : nB;
+    const nImg=(cfg.split==='owner')? nOwn : ((cfg.split==='batch')? nB : 1);
+    const nSec=(cfg.split==='owner'||cfg.split==='batch')? nB*nOwn : nB;
+    const splitName=(cfg.split==='owner')? '每负责人 1 张' : ((cfg.split==='batch')? '每营期 1 张' : '全部合 1 张');
     $('#puPrev').innerHTML='将推送 <b>'+nImg+'</b> 张图　·　营期：<b>'+esc(bs.join('、')||'—')+'</b>　·　负责人：<b>'+esc(owners.join('、')||'（未标注）')+'</b>'
-      +'<br>图内分节：<b>'+nSec+'</b> 节（负责人 × 营期）· 每节 ＝ 负责人大盘 + 层级明细'
+      +'<br>拆分：<b>'+splitName+'</b>　·　图内分节：<b>'+nSec+'</b> 节（负责人 × 营期）· 每节 ＝ 负责人大盘 + 层级明细'
       +'<br>差值基准：层级明细行 vs <b>负责人大盘</b>；负责人大盘行 vs <b>营期大盘</b>'
       +'<br>预警规则不受影响（仍按营期大盘）';
   }
@@ -5482,20 +5554,22 @@ async function alPushRun(panel,cfg,scope,all){
   if(!sections.length){ say('⚠ 所选营期在本范围内没有数据','err'); return; }
   const cat=state.cat||'';
   const jobs=[];
-  if(cfg.split==='owner'){
-    const by={}, order=[];
-    sections.forEach(s=>{ const k=s.owner||''; if(!by[k]){ by[k]=[]; order.push(k); } by[k].push(s); });
-    order.forEach(k=>jobs.push({ label:k||'未标注负责人', titleOwner:k, secs:by[k] }));
-  } else {
-    jobs.push({ label:'全部', titleOwner:'', secs:sections });
-  }
+  const groupBy=(keyFn,labelFn)=>{
+    const by={}, korder=[];
+    sections.forEach(s=>{ const k=keyFn(s); if(!by[k]){ by[k]=[]; korder.push(k); } by[k].push(s); });
+    korder.forEach(k=>jobs.push({ label:labelFn(k), titleLabel:labelFn(k), secs:by[k] }));
+  };
+  if(cfg.split==='owner')      groupBy(s=>s.owner||'', k=>k? ('负责人 '+k) : '未标注负责人');
+  else if(cfg.split==='batch') groupBy(s=>s.batch||'', k=>'营期 '+k);
+  else                         jobs.push({ label:'全部', titleLabel:'', secs:sections });
+  const splitName=(cfg.split==='owner')?'按负责人拆图':((cfg.split==='batch')?'按营期拆图':'合并为一张');
   const base=pushBase();
   let ok=0; const sized=[];
   for(let i=0;i<jobs.length;i++){
     const j=jobs[i];
     say('正在生成并推送「'+esc(j.label)+'」汇总图（'+(i+1)+'/'+jobs.length+'）…','info');
     let dataUrl;
-    try{ dataUrl=alPushImageDataUrl(j.secs, cat, panel, j.titleOwner); }
+    try{ dataUrl=alPushImageDataUrl(j.secs, cat, panel, j.titleLabel); }
     catch(e){ say('❌ 生成「'+esc(j.label)+'」图片失败：'+esc(e.message||e),'err'); return; }
     sized.push(j.label+' '+Math.round(dataUrl.length*0.75/1024)+'KB');
     try{
@@ -5519,7 +5593,7 @@ async function alPushRun(panel,cfg,scope,all){
     if(res.ok){
       const nm=(res.push&&res.push.chat_name)||chatid;
       say('✅ 已推送 '+ok+' 张汇总图 + 文字分析到「'+esc(nm)+'」<br><span style="color:var(--dim)">'+esc(sized.join(' · '))+'</span>','success');
-      auditLog('企微推送','预警洞察 · '+(isAct?'转化中':'已结束')+'汇总图×'+ok+'（按负责人拆图）+ 文字分析 → '+nm);
+      auditLog('企微推送','预警洞察 · '+(isAct?'转化中':'已结束')+'汇总图×'+ok+'（'+splitName+'）+ 文字分析 → '+nm);
     } else {
       say('⚠ 图片已送达（'+ok+' 张），文字分析推送失败：'+esc(res.error||'未知错误'),'err');
     }
