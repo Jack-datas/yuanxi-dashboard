@@ -184,9 +184,12 @@ svg text{font-family:var(--num)}
 
 /* ===== table ===== */
 .tbl-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;max-width:100%}
-table.data{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
-table.data th{background:var(--bg2);color:var(--muted);font-weight:600;text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2;font-size:11px;letter-spacing:.3px}
-table.data td{padding:8px 11px;border-bottom:1px solid rgba(30,47,77,.5);font-family:var(--num)}
+/* ★ 2026-09-15：表格统一「居中 + 按内容自适应列宽」。
+   width:max-content + min-width:100% ⇒ 列宽由内容决定（不再强行等分/拉伸），表比容器宽时横向滚动。
+   !important 用于压掉各模块里的内联 text-align（历史遗留的左/右对齐）。 */
+table.data{width:max-content;min-width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
+table.data th{background:var(--bg2);color:var(--muted);font-weight:600;text-align:center !important;padding:9px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2;font-size:11px;letter-spacing:.3px}
+table.data td{padding:8px 12px;border-bottom:1px solid rgba(30,47,77,.5);font-family:var(--num);text-align:center !important}
 table.data tr:hover td{background:rgba(56,189,248,.04)}
 table.data tr:last-child td{border-bottom:none}
 .tag{display:inline-block;font-size:10px;border-radius:5px;padding:1px 6px}
@@ -382,8 +385,9 @@ table.data tr:last-child td{border-bottom:none}
 .hl-bar-val{font-weight:700;font:700 12px/1 var(--num);white-space:nowrap}
 .hl-bar-track{display:block;height:12px;background:#14233f;border-radius:6px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.35)}
 .hl-bar-fill{display:block;height:100%;border-radius:6px;transition:width .8s cubic-bezier(.5,1.4,.5,1);box-shadow:0 2px 6px rgba(0,0,0,.35)}
-table.ht-tbl{width:100%;border-collapse:collapse;font-size:11px}
-table.ht-tbl th{background:#15243a;padding:6px 8px;text-align:left;color:#8b9bb5;font-weight:600;border-bottom:1px solid #1e2f4d;white-space:nowrap}
+table.ht-tbl{width:max-content;min-width:100%;border-collapse:collapse;font-size:11px}
+table.ht-tbl th{background:#15243a;padding:6px 8px;text-align:center;color:#8b9bb5;font-weight:600;border-bottom:1px solid #1e2f4d;white-space:nowrap}
+table.ht-tbl td{text-align:center}
 table.ht-tbl td{padding:6px 8px;border-bottom:1px solid rgba(30,47,77,.4);color:#c7d3e6;vertical-align:top}
 table.ht-tbl tr:last-child td{border-bottom:none}
 table.ht-tbl tr:hover{background:rgba(34,211,238,.05)}
@@ -442,7 +446,7 @@ table.lb-tbl-full{width:100%;border-collapse:separate;border-spacing:0;font-size
 .lb-tbl-full thead tr.lb-th-g th.g6{color:#fcd34d;border-bottom-color:#f59e0b}
 .lb-tbl-full thead th.cur-sort::after{content:'▲';font-size:9px;margin-left:4px;color:#22d3ee}
 .lb-tbl-full tbody td{padding:8px 8px;border-bottom:1px solid rgba(30,47,77,.5);text-align:center;white-space:nowrap;color:#c7d3e6}
-.lb-tbl-full tbody td.num{font:600 12px/1.4 var(--num);text-align:right;color:#d7e2f4}
+.lb-tbl-full tbody td.num{font:600 12px/1.4 var(--num);text-align:center;color:#d7e2f4}
 .lb-tbl-full tbody tr.lb-row{transition:background .15s}
 .lb-tbl-full tbody tr.lb-row:hover{background:rgba(34,211,238,.06)}
 .lb-tbl-full tbody tr.r1{border-left:3px solid #10b981}
@@ -453,7 +457,7 @@ table.lb-tbl-full{width:100%;border-collapse:separate;border-spacing:0;font-size
 .lb-rank-no{font:800 17px/1 var(--num);letter-spacing:-1px;min-width:22px;text-align:center}
 .lb-ava{position:relative;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 14px/1 var(--font);flex:none;border:1px solid rgba(255,255,255,.12)}
 .lb-medal{position:absolute;top:-6px;right:-6px;font-size:14px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
-.lb-name-txt{font-weight:600;color:#e7effc;text-align:left}
+.lb-name-txt{font-weight:600;color:#e7effc;text-align:center}
 .lb-tbl-full tbody .lb-diff{font-weight:700}
 .lb-tbl-full tbody .lb-diff.pos{color:#34d399}
 .lb-tbl-full tbody .lb-diff.neg{color:#f87171}
@@ -473,9 +477,9 @@ table.lb-tbl-full{width:100%;border-collapse:separate;border-spacing:0;font-size
 .lb-rank{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;border-radius:8px;text-align:center}
 .lb-rank-no{font:700 22px/1 var(--num);letter-spacing:-1px}
 .lb-rank-icon{font-size:18px;line-height:1;margin-top:2px}
-.lb-tbl{width:100%;border-collapse:collapse;font-size:12px}
-.lb-tbl td{padding:6px 8px;border-right:1px solid rgba(255,255,255,.04);white-space:nowrap;text-align:right;color:#c7d3e6}
-.lb-tbl td:first-child{text-align:left}
+.lb-tbl{width:max-content;min-width:100%;border-collapse:collapse;font-size:12px}
+.lb-tbl td{padding:6px 8px;border-right:1px solid rgba(255,255,255,.04);white-space:nowrap;text-align:center;color:#c7d3e6}
+.lb-tbl td:first-child{text-align:center}
 .lb-tbl td b{color:#fff}
 .lb-diff{font-weight:700}
 .lb-diff.pos{color:#34d399}
@@ -3979,15 +3983,57 @@ async function pushNow(){
 }
 
 /* ---------- 榜单出图（canvas → PNG dataURL；浅色卡片，适合群内查看） ---------- */
+/* ============================================================
+   出图通用工具（2026-09-15）：列宽按内容自适应 + 全部居中
+   ------------------------------------------------------------
+   ★ 用户要求：图变宽没关系、必须完整 → 列宽只按内容放大，不做省略号截断；
+     表头与单元格一律居中。
+   ★ fitCols() 需要先传入一个 canvas 2d context 用于 measureText（逻辑像素测量）。
+   ============================================================ */
+const BC_FONT='"Microsoft YaHei","PingFang SC",-apple-system,sans-serif';
+/* 按「表头 + 全部单元格文本」测量列宽；c.min / c.max 为可选下限 / 上限（max<=0 或不填＝不限） */
+function fitCols(g, cols, cells, opts){
+  const o=opts||{};
+  const pad=(o.pad==null?24:o.pad);
+  const headerFont=o.headerFont||('bold 14px '+BC_FONT);
+  const cellFont=o.cellFont||('14px '+BC_FONT);
+  cols.forEach((c,i)=>{
+    g.font=headerFont;
+    let w=g.measureText(String(c.t==null?'':c.t)).width;
+    g.font=cellFont;
+    (cells||[]).forEach(row=>{
+      const v=(row&&row[i]!=null)? String(row[i]) : '';
+      if(!v) return;
+      const tw=g.measureText(v).width;
+      if(tw>w) w=tw;
+    });
+    let fw=Math.ceil(w+pad);
+    if(c.min!=null) fw=Math.max(fw,c.min);
+    if(c.max!=null && c.max>0) fw=Math.min(fw,c.max);
+    c.w=fw;
+  });
+  return cols;
+}
+/* ---------- 榜单出图（canvas → PNG；浅色卡片，适合群内查看） ---------- */
 function rankImageDataUrl(){
   const cfg=getPushFormConfig();
   const r=rankItemsFor(cfg);
-  const FONT='"Microsoft YaHei","PingFang SC",-apple-system,sans-serif';
-  const S=2, W=1000;                                   // 2 倍分辨率出图
-  const padX=46, titleH=138, headH=52, rowH=46, footH=86;
+  const FONT=BC_FONT;
+  const S=2, padX=46, titleH=138, headH=52, rowH=46, footH=86;
   const rows=r.list.slice(0,20);
-  const H=titleH+headH+Math.max(rows.length,1)*rowH+footH;
+  const cols=[
+    {t:'排名',   min:86},
+    {t:'名称',   min:190},
+    {t:'原始人数', min:140},
+    {t:'总转率',  min:130},
+    {t:'总产值',  min:150}
+  ];
+  const cells=rows.map(it=>[ String(it.rank), String(it.name), fmt(it.m.原始人数,0), fmtPct(it.m.总尾款转化率,1), fmt(it.m.总产值,1) ]);
   const cv=document.createElement('canvas');
+  fitCols(cv.getContext('2d'), cols, cells, {pad:44, headerFont:'bold 15px '+FONT, cellFont:'15px '+FONT});
+  const cellW=cols.reduce((a,c)=>a+c.w,0);
+  const W=cellW+padX*2;
+  const H=titleH+headH+Math.max(rows.length,1)*rowH+footH;
   cv.width=Math.round(W*S); cv.height=Math.round(H*S);
   const g=cv.getContext('2d'); g.scale(S,S);
 
@@ -4005,27 +4051,12 @@ function rankImageDataUrl(){
   g.fillText('维度：'+(cfg.level||'-')+(r.tierName?('　档位：'+r.tierName):'')+'　共 '+r.total+' 项'+(r.note?('　（'+r.note+'）'):''), padX, 112);
   g.globalAlpha=1;
 
-  // 列：排名 / 名称 / 原始人数 / 总转率 / 总产值
-  const cols=[
-    {t:'排名',   w:84,  a:'center'},
-    {t:'名称',   w:0,   a:'left'},
-    {t:'原始人数', w:150, a:'right'},
-    {t:'总转率',  w:150, a:'right'},
-    {t:'总产值',  w:160, a:'right'}
-  ];
-  const cellW=W-padX*2;
-  cols[1].w=cellW-cols.reduce((a,c)=>a+c.w,0);
-
-  // 表头
+  // 表头（居中）
   const hy=titleH;
-  g.fillStyle='#eef3fb'; g.fillRect(padX-10,hy,cellW+20,headH);
-  g.fillStyle='#33415c'; g.font='bold 15px '+FONT;
+  g.fillStyle='#eef3fb'; g.fillRect(0,hy,W,headH);
+  g.fillStyle='#33415c'; g.font='bold 15px '+FONT; g.textAlign='center';
   let cx=padX;
-  cols.forEach(c=>{
-    g.textAlign = c.a==='right'?'right':(c.a==='center'?'center':'left');
-    g.fillText(c.t, c.a==='right'? cx+c.w-12 : (c.a==='center'? cx+c.w/2 : cx+12), hy+33);
-    cx+=c.w;
-  });
+  cols.forEach(c=>{ g.fillText(c.t, cx+c.w/2, hy+33); cx+=c.w; });
 
   // 数据行
   let y=hy+headH;
@@ -4036,18 +4067,18 @@ function rankImageDataUrl(){
   } else {
     rows.forEach((it,i)=>{
       g.fillStyle = i%2 ? '#f7f9fd' : '#ffffff';
-      g.fillRect(padX-10, y, cellW+20, rowH);
+      g.fillRect(0, y, W, rowH);
       const top3 = it.rank<=3;
-      const vals=[ String(it.rank), String(it.name), fmt(it.m.原始人数,0), fmtPct(it.m.总尾款转化率,1), fmt(it.m.总产值,1) ];
+      const vals=cells[i];
       cx=padX;
       cols.forEach((c,ci)=>{
-        g.textAlign = c.a==='right'?'right':(c.a==='center'?'center':'left');
-        const tx = c.a==='right'? cx+c.w-12 : (c.a==='center'? cx+c.w/2 : cx+12);
+        const tx=cx+c.w/2;
+        g.textAlign='center';
         if(ci===0){
           if(top3){
             g.fillStyle = it.rank===1?'#e8a33d':(it.rank===2?'#8fa3bd':'#c08457');
             g.beginPath(); g.arc(tx, y+rowH/2, 15, 0, Math.PI*2); g.fill();
-            g.fillStyle='#ffffff'; g.font='bold 15px '+FONT; g.textAlign='center';
+            g.fillStyle='#ffffff'; g.font='bold 15px '+FONT;
             g.fillText(vals[ci], tx, y+rowH/2+5);
           } else {
             g.fillStyle='#7a8aa4'; g.font='15px '+FONT;
@@ -4061,7 +4092,7 @@ function rankImageDataUrl(){
         cx+=c.w;
       });
       g.strokeStyle='#e8eef7'; g.lineWidth=1;
-      g.beginPath(); g.moveTo(padX-10,y+rowH); g.lineTo(padX+cellW+10,y+rowH); g.stroke();
+      g.beginPath(); g.moveTo(0,y+rowH); g.lineTo(W,y+rowH); g.stroke();
       y+=rowH;
     });
   }
@@ -5179,41 +5210,60 @@ function alPushImageModel(sections, cat){
     return { owner:sec.owner, batch:sec.batch, day:sec.day, bench:bench, rows:rows, n:rows.length+1 };
   });
 }
+/* 汇总表列（含内容自适应的最小宽度；出图统一居中） */
 function alSumCols(cat){
   const cols=[
-    {t:'层级 / 姓名',   w:186, a:'left'},
-    {t:'阶段',          w:78,  a:'left'},
-    {t:'原始人数',      w:86,  a:'right'},
-    {t:'授权人数',      w:86,  a:'right'},
-    {t:'总流水(万)',    w:98,  a:'right'},
-    {t:'总产值',        w:92,  a:'right'},
-    {t:'产值vs基准',    w:108, a:'right'},
-    {t:'总尾款转率',    w:102, a:'right'},
-    {t:'转率vs基准',    w:104, a:'right'},
-    {t:'总单数',        w:74,  a:'right'},
-    {t:'1日转率',       w:84,  a:'right'},
-    {t:'3日转率',       w:84,  a:'right'},
-    {t:'7日转率',       w:84,  a:'right'},
-    {t:'1日产值',       w:86,  a:'right'},
-    {t:'3日产值',       w:86,  a:'right'},
-    {t:'7日产值',       w:86,  a:'right'}
+    {t:'层级 / 姓名',   min:206},
+    {t:'阶段',          min:84},
+    {t:'原始人数',      min:96},
+    {t:'授权人数',      min:96},
+    {t:'总流水(万)',    min:112},
+    {t:'总产值',        min:100},
+    {t:'产值vs基准',    min:126},
+    {t:'总尾款转率',    min:118},
+    {t:'转率vs基准',    min:122},
+    {t:'总单数',        min:88},
+    {t:'1日转率',       min:96},
+    {t:'3日转率',       min:96},
+    {t:'7日转率',       min:96},
+    {t:'1日产值',       min:98},
+    {t:'3日产值',       min:98},
+    {t:'7日产值',       min:98}
   ];
-  if(cat==='大课数据'){ cols.push({t:'总定金转化率',w:110,a:'right'}); cols.push({t:'定金追回率',w:98,a:'right'}); }
+  if(cat==='大课数据'){ cols.push({t:'总定金转化率',min:132}); cols.push({t:'定金追回率',min:118}); }
   return cols;
 }
-/* 一组分节（同一负责人 / 或全合并）→ 一张 PNG */
+/* 一组分节（同一负责人 / 或全合并）→ 一张 PNG（列宽按内容自适应 · 全部居中） */
 function alPushImageDataUrl(sections, cat, panel, titleLabel){
   const model=alPushImageModel(sections, cat);
   const hasDeposit=(cat==='大课数据');
-  const FONT='"Microsoft YaHei","PingFang SC",-apple-system,sans-serif';
-  const S=2, padX=40, titleH=132, headH=46, rowH=36, secH=32, footH=92;
+  const FONT=BC_FONT;
+  const S=2, padX=40, titleH=132, headH=48, rowH=38, secH=34, footH=92;
   const cols=alSumCols(cat);
+  const cellOf=it=>{
+    const tag=it.isBench? '负责人大盘' : (it.dim||'');
+    const v=[
+      tag+' '+(it.name||'')+(it.isBench? ' （基准行）':''), it.stage||'',
+      fmt(it.p,0), fmt(it.auth,0), fmt(it.flowWan,1), fmt(it.val,1),
+      it.dVal==null?'—':((it.dVal>=0?'▲ +':'▼ ')+fmt(it.dVal,1)+'%'),
+      fmtPct(it.rate,1),
+      it.dRate==null?'—':((it.dRate>=0?'▲ +':'▼ ')+fmt(it.dRate,1)+'pt'),
+      fmt(it.orders,0),
+      fmtPct(it.d1,1), fmtPct(it.d3,1), fmtPct(it.d7,1),
+      fmt(it.v1,1), fmt(it.v3,1), fmt(it.v7,1)
+    ];
+    if(hasDeposit){ v.push(fmtPct(it.dep,1)); v.push(it.depBack==null?'—':fmtPct(it.depBack,1)); }
+    return v;
+  };
+  const cells=[];
+  model.forEach(sec=>{ cells.push(cellOf(sec.bench)); sec.rows.forEach(it=>cells.push(cellOf(it))); });
+  const cv=document.createElement('canvas');
+  fitCols(cv.getContext('2d'), cols, cells, {pad:30, headerFont:'bold 14px '+FONT, cellFont:'14px '+FONT});
   const cellW=cols.reduce((a,c)=>a+c.w,0);
   const W=cellW+padX*2;
   let bodyH=0;
   model.forEach(sec=>{ bodyH += secH + (1+sec.rows.length)*rowH; });
   const H=titleH+headH+Math.max(bodyH,rowH)+footH;
-  const cv=document.createElement('canvas');
   cv.width=Math.round(W*S); cv.height=Math.round(H*S);
   const g=cv.getContext('2d'); g.scale(S,S);
   g.fillStyle='#ffffff'; g.fillRect(0,0,W,H);
@@ -5230,53 +5280,47 @@ function alPushImageDataUrl(sections, cat, panel, titleLabel){
   g.fillText('营期：'+distinct(sections,r=>r.batch).join('、')+'　·　本文 '+model.length+' 节（负责人 × 营期）', padX, 102);
   g.globalAlpha=1;
 
-  // 表头
+  // 表头（居中）
   const hy=titleH;
   g.fillStyle='#eef3fb'; g.fillRect(0,hy,W,headH);
-  g.fillStyle='#33415c'; g.font='bold 14px '+FONT;
+  g.fillStyle='#33415c'; g.font='bold 14px '+FONT; g.textAlign='center';
   let cx=padX;
-  cols.forEach(c=>{ g.textAlign=c.a==='right'?'right':'left'; g.fillText(c.t, c.a==='right'? cx+c.w-10 : cx+10, hy+29); cx+=c.w; });
+  cols.forEach(c=>{ g.fillText(c.t, cx+c.w/2, hy+30); cx+=c.w; });
 
   let y=hy+headH;
   function drawRow(it,isBench){
     g.fillStyle = isBench? '#eaf2ff' : '#ffffff';
     g.fillRect(0,y,W,rowH);
-    const vals=[
-      it.name||'', it.stage, fmt(it.p,0), fmt(it.auth,0), fmt(it.flowWan,1), fmt(it.val,1),
-      it.dVal==null?'—':((it.dVal>=0?'▲ +':'▼ ')+fmt(it.dVal,1)+'%'),
-      fmtPct(it.rate,1),
-      it.dRate==null?'—':((it.dRate>=0?'▲ +':'▼ ')+fmt(it.dRate,1)+'pt'),
-      fmt(it.orders,0),
-      fmtPct(it.d1,1), fmtPct(it.d3,1), fmtPct(it.d7,1),
-      fmt(it.v1,1), fmt(it.v3,1), fmt(it.v7,1)
-    ];
-    if(hasDeposit){ vals.push(fmtPct(it.dep,1)); vals.push(it.depBack==null?'—':fmtPct(it.depBack,1)); }
+    const vals=cellOf(it);
     cx=padX;
     cols.forEach((c,ci)=>{
-      g.textAlign = c.a==='right'?'right':'left';
-      const tx = c.a==='right'? cx+c.w-10 : cx+10;
       const v=vals[ci];
       if(ci===0){
         const tag=isBench? '负责人大盘' : it.dim;
         const col=AL_DIM_COLOR[tag]||'#33415c';
+        g.font='11px '+FONT; const tagW=g.measureText(tag).width;
+        g.font='14px '+FONT; const nameW=g.measureText(it.name||'').width;
+        let extraW=0;
+        if(isBench){ g.font='bold 12.5px '+FONT; extraW=g.measureText('（基准行）').width+6; }
+        const sx=cx+Math.max(6,(c.w-(tagW+8+nameW+extraW))/2);
         g.fillStyle=col; g.beginPath();
-        if(g.roundRect) g.roundRect(cx+10,y+rowH/2-9,4,18,2); else g.rect(cx+10,y+rowH/2-9,4,18);
+        if(g.roundRect) g.roundRect(sx-11,y+rowH/2-9,4,18,2); else g.rect(sx-11,y+rowH/2-9,4,18);
         g.fill();
-        g.font='11px '+FONT; g.fillStyle=col;
-        g.fillText(tag, cx+22, y+rowH/2+4);
-        const tw=g.measureText(tag).width;
-        if(isBench){ g.fillStyle='#0f766e'; g.font='bold 12.5px '+FONT; g.fillText('（基准行）', cx+22+tw+6, y+rowH/2+4); }
-        else { g.fillStyle='#33415c'; g.font='14px '+FONT; g.fillText(v, cx+22+tw+8, y+rowH/2+5); }
+        g.textAlign='left'; g.font='11px '+FONT; g.fillStyle=col; g.fillText(tag, sx, y+rowH/2+4);
+        if(isBench){ g.font='bold 12.5px '+FONT; g.fillStyle='#0f766e'; g.fillText('（基准行）', sx+tagW+8, y+rowH/2+4); }
+        else { g.font='14px '+FONT; g.fillStyle='#33415c'; g.fillText(it.name||'', sx+tagW+8, y+rowH/2+5); }
       } else if(ci===6||ci===8){
         const dv=(ci===6? it.dVal : it.dRate);
         if(dv==null){ g.fillStyle='#aab6c8'; g.font='14px '+FONT; }
         else { g.fillStyle = dv>=0 ? '#ef4444' : '#10b981'; g.font='bold 14px '+FONT; }
-        g.fillText(v, tx, y+rowH/2+5);
+        g.textAlign='center'; g.fillText(v, cx+c.w/2, y+rowH/2+5);
       } else if(ci===7){
-        g.fillStyle='#2f6fed'; g.font='bold 14px '+FONT; g.fillText(v, tx, y+rowH/2+5);
+        g.fillStyle='#2f6fed'; g.font='bold 14px '+FONT;
+        g.textAlign='center'; g.fillText(v, cx+c.w/2, y+rowH/2+5);
       } else {
         g.fillStyle = isBench? '#0f172a' : '#33415c';
-        g.font = (isBench?'bold ':'')+'14px '+FONT; g.fillText(v, tx, y+rowH/2+5);
+        g.font = (isBench?'bold ':'')+'14px '+FONT;
+        g.textAlign='center'; g.fillText(v, cx+c.w/2, y+rowH/2+5);
       }
       cx+=c.w;
     });
@@ -5302,7 +5346,7 @@ function alPushImageDataUrl(sections, cat, panel, titleLabel){
   // 页脚
   g.textAlign='left'; g.fillStyle='#8b9bb4'; g.font='12.5px '+FONT;
   g.fillText('差值基准：负责人大盘行 ＝ vs 该营期营期大盘；经理/主管/组长/教练行 ＝ vs 本节负责人大盘（▲红 高于基准　▼绿 低于）', padX, y+30);
-  g.fillText('转率＝总单数 / 原始人数　·　产值＝流水 / 原始人数 × 单产系数（低价链路 ×0.055）', padX, y+52);
+  g.fillText('转率＝总单数 / 原始人数　·　产值＝流水 / 原始人数 × 单产系数（低价链路 ×0.055）　·　列宽按内容自适应', padX, y+52);
   g.fillStyle='#8b9bb4'; g.textAlign='right';
   g.fillText('生成时间：'+new Date().toLocaleString('zh-CN'), W-padX, y+30);
   g.fillText('元析智察 · 教育转化监测工作台', W-padX, y+52);
@@ -5526,15 +5570,71 @@ function alWrap(g,s,maxW,maxLines){
   return keep;
 }
 /* 预警清单 → PNG（一张） */
+/* 预警「明细（只保留低于判定线的对象）」→ 图内小表模型
+   4 类预警各有一套 detail 结构：
+   · 转化进度落后（无 type）：该期 vs 基准的转率 / 产值两行判定
+   · team（主管团队低于大盘）：只列 below 的主管
+   · d1（首日转化偏弱）：只列命中的营期
+   · person（人员转化偏低）：只列低于判定线的教练（按转率升序） */
+function alertDetailModel(a){
+  const d=a&&a.detail; if(!d) return null;
+  if(!d.type){
+    return { cols:[{t:'指标',min:96},{t:'该期',min:88},{t:'基准',min:88},{t:'偏差',min:96},{t:'判定',min:88}],
+      rows:[
+        ['尾款转率', fmtPct(d.cur.rate,1), fmtPct(d.baseTot.rate,1), (d.dRate>=0?'+':'')+fmt(d.dRate,1)+'pt', d.hitRate?'超标':'正常'],
+        ['累计产值', fmt(d.cur.val,1), fmt(d.baseTot.val,1), (d.dVal>=0?'+':'')+fmt(d.dVal,1)+'%', d.hitVal?'超标':'正常']
+      ],
+      tail:'基准＝已结束最近 '+(d.baseList?d.baseList.length:'—')+' 期（'+(d.useTotal?'总累计':('D'+d.d+' 累计'))+'加权）；转率阈值 ≥'+d.th.rate+'pt · 产值阈值 ≥'+d.th.val+'%' };
+  }
+  if(d.type==='team'){
+    const list=(d.list||[]).filter(x=>x.below).sort((x,y)=>x.rate-y.rate);
+    return { cols:[{t:'主管团队',min:120},{t:'原始人数',min:96},{t:'尾款转化率',min:116},{t:'vs 大盘',min:104}],
+      rows:list.map(x=>[x.name, fmt(x.p,0), fmtPct(x.rate,1), ((x.rate-d.mrate)>=0?'+':'')+fmt((x.rate-d.mrate)*100,1)+'pt']),
+      tail:'大盘 '+fmtPct(d.mrate,2)+' · 阈值 低于大盘 '+d.th+'% → 判定线 '+fmtPct(d.line,2)+'　·　仅列低于判定线的对象' };
+  }
+  if(d.type==='d1'){
+    const list=(d.list||[]).filter(x=>x.hit).sort((x,y)=>x.rate-y.rate);
+    return { cols:[{t:'营期',min:92},{t:'阶段',min:80},{t:'原始人数',min:92},{t:'D1 尾款转化率',min:126},{t:'vs 基准',min:100}],
+      rows:list.map(x=>[x.b, (x.day!=null?('Day '+x.day):'—'), fmt(x.p,0), fmtPct(x.rate,1), ((x.rate-d.base)>=0?'+':'')+fmt((x.rate-d.base)*100,1)+'pt']),
+      tail:'基准＝已结束营期 D1 加权均值 '+fmtPct(d.base,2)+' · 阈值 '+d.th+'% → 判定线 '+fmtPct(d.line,2)+'　·　仅列低于判定线的营期' };
+  }
+  if(d.type==='person'){
+    const list=(d.low||[]).slice().sort((x,y)=>x.rate-y.rate);
+    return { cols:[{t:'教练',min:96},{t:'组长 / 主管',min:150},{t:'原始人数',min:88},{t:'尾款转化率',min:110},{t:'vs 大盘',min:96}],
+      rows:list.map(x=>[x.name, ((x.group||'—')+' / '+(x.mgr||'—')), fmt(x.p,0), fmtPct(x.rate,1), ((x.rate-d.mrate)>=0?'+':'')+fmt((x.rate-d.mrate)*100,1)+'pt']),
+      tail:'大盘 '+fmtPct(d.mrate,2)+' · 阈值 低于大盘 '+d.th+'% → 判定线 '+fmtPct(d.line,2)+'　·　命中 '+d.low.length+'/'+d.list.length+' 名（占比 '+fmtPct(d.share,1)+'）　·　仅列低于判定线的教练' };
+  }
+  return null;
+}
+/* 预警清单 → PNG（结论 → 明细 交错；只发这一张图）
+   上限：结论 8 条、每条明细 6 行；超出在页脚注明。 */
 function alertImageDataUrl(){
-  const FONT='"Microsoft YaHei","PingFang SC",-apple-system,sans-serif';
-  const S=2, W=1080, padX=40, titleH=112, itemH=78, gap=10, footH=60;
+  const FONT=BC_FONT;
+  const S=2, W=1180, padX=40, titleH=112, footH=66, MAXA=8, MAXR=6;
   const alerts=buildAlerts();
   const n=alertCounts(alerts);
-  const items=alerts.slice(0,14);
-  const bodyH=(items.length? items.length*(itemH+gap) : 84);
-  const H=titleH+bodyH+footH;
   const cv=document.createElement('canvas');
+  const g0=cv.getContext('2d');
+  const items=alerts.slice(0,MAXA).map(a=>{
+    const det=alertDetailModel(a);
+    if(det){
+      det.over=(det.rows.length>MAXR? det.rows.length-MAXR : 0);
+      det.rows=det.rows.slice(0,MAXR);
+      fitCols(g0, det.cols, det.rows, {pad:26, headerFont:'bold 12.5px '+FONT, cellFont:'13px '+FONT});
+      det.w=det.cols.reduce((s,c)=>s+c.w,0);
+    }
+    g0.font='13px '+FONT;
+    return { a:a, det:det, lines:alWrap(g0, a.s||'', W-padX*2-56, 2) };
+  });
+  // 高度预算
+  let H=titleH+16;
+  if(!items.length) H+=88;
+  items.forEach(it=>{
+    H+=28+it.lines.length*20+12;
+    if(it.det) H+=30+it.det.rows.length*30+26;
+    H+=18;
+  });
+  H+=footH;
   cv.width=W*S; cv.height=H*S;
   const g=cv.getContext('2d'); g.scale(S,S);
   g.fillStyle='#ffffff'; g.fillRect(0,0,W,H);
@@ -5544,31 +5644,60 @@ function alertImageDataUrl(){
   g.font='bold 27px '+FONT; g.fillText('元析智察 · 预警清单', padX, 48);
   g.font='14px '+FONT; g.globalAlpha=0.95;
   g.fillText(alWrap(g,(state.project||'-')+' / '+(state.link||'-')+' / '+(isAllCat()?'全部品类':catName(state.cat))+' · '+fmtScope(), W-padX*2, 1)[0], padX, 76);
-  g.fillText('共 '+alerts.length+' 条　严重 '+n.red+'　关注 '+n.yellow+'　提示 '+n.blue, padX, 98);
+  g.fillText('共 '+alerts.length+' 条　严重 '+n.red+'　关注 '+n.yellow+'　提示 '+n.blue+'　·　结论 + 明细（仅列低于判定线的对象）', padX, 98);
   g.globalAlpha=1;
   const COL={red:'#e24b4a',yellow:'#ef9f27',blue:'#378add'};
   const TXT={red:'#a32d2d',yellow:'#854f0b',blue:'#185fa5'};
-  let y=titleH+14;
+  let y=titleH+16;
   if(!items.length){
     g.fillStyle='#0f766e'; g.font='bold 17px '+FONT; g.textAlign='left';
     g.fillText('当前范围无触发预警', padX+8, y+38);
-    y+=84;
+    y+=88;
   }
-  items.forEach(a=>{
-    const lv=COL[a.lv]? a.lv : 'blue';
-    g.fillStyle='#fcfcfd'; g.fillRect(padX,y,W-padX*2,itemH);
-    g.strokeStyle='#e8eef7'; g.lineWidth=1; g.strokeRect(padX+0.5,y+0.5,W-padX*2-1,itemH-1);
-    g.fillStyle=COL[lv]; g.fillRect(padX,y,4,itemH);
-    g.fillStyle=TXT[lv]; g.font='bold 15px '+FONT;
-    g.fillText(alWrap(g,AL_LV_ICON[lv]+' '+(a.t||''), W-padX*2-40, 1)[0], padX+18, y+27);
+  items.forEach(it=>{
+    const lv=COL[it.a.lv]? it.a.lv : 'blue';
+    // 结论
+    g.fillStyle=COL[lv]; g.fillRect(padX, y+2, 4, 22);
+    g.textAlign='left'; g.fillStyle=TXT[lv]; g.font='bold 15.5px '+FONT;
+    g.fillText(alWrap(g, (AL_LV_ICON[lv]||'')+' '+(it.a.t||''), W-padX*2-30, 1)[0], padX+16, y+18);
     g.fillStyle='#5f5e5a'; g.font='13px '+FONT;
-    alWrap(g,a.s||'', W-padX*2-40, 2).forEach((ln,i)=>{ g.fillText(ln, padX+18, y+51+i*19); });
-    y+=itemH+gap;
+    it.lines.forEach((ln,i)=>{ g.fillText(ln, padX+16, y+42+i*20); });
+    y+=28+it.lines.length*20+12;
+    // 明细
+    if(it.det){
+      const det=it.det;
+      const x0=padX+16;
+      g.fillStyle='#f2f6fd'; g.fillRect(x0, y, det.w, 30);
+      g.strokeStyle='#e2eaf7'; g.lineWidth=1; g.strokeRect(x0+0.5, y+0.5, det.w-1, 30-1);
+      let cxx=x0; g.textAlign='center'; g.fillStyle='#33415c'; g.font='bold 12.5px '+FONT;
+      det.cols.forEach(c=>{ g.fillText(c.t, cxx+c.w/2, y+20); cxx+=c.w; });
+      y+=30;
+      det.rows.forEach((row,ri)=>{
+        g.fillStyle = ri%2? '#fafbfd' : '#ffffff';
+        g.fillRect(x0, y, det.w, 30);
+        cxx=x0;
+        det.cols.forEach((c,ci)=>{
+          g.textAlign='center';
+          const bad=/超标|低于判定线/.test(String(row[ci])) || /^-/.test(String(row[ci]));
+          g.fillStyle = bad? '#a32d2d' : '#33415c';
+          g.font=(ci===0? '13px ' : '13px ')+FONT;
+          g.fillText(String(row[ci]), cxx+c.w/2, y+20);
+          cxx+=c.w;
+        });
+        g.strokeStyle='#eef2f8'; g.beginPath(); g.moveTo(x0,y+30); g.lineTo(x0+det.w,y+30); g.stroke();
+        y+=30;
+      });
+      g.textAlign='left'; g.fillStyle='#8b9bb4'; g.font='12px '+FONT;
+      const note=(det.tail||'')+(det.over? ('　·　另有 '+det.over+' 个未列出'):'');
+      g.fillText(alWrap(g, note, W-padX*2-30, 1)[0], x0, y+18);
+      y+=26;
+    }
+    y+=18;
   });
   // 页脚
   g.textAlign='left'; g.fillStyle='#8b9bb4'; g.font='12.5px '+FONT;
-  if(alerts.length>items.length && items.length) g.fillText('另有 '+(alerts.length-items.length)+' 条未显示，详见看板预警专区', padX, y+26);
-  g.fillText('红＝严重 · 黄＝关注 · 蓝＝提示　·　生成时间：'+new Date().toLocaleString('zh-CN'), padX, y+(alerts.length>items.length&&items.length? 46 : 28));
+  if(alerts.length>items.length && items.length) g.fillText('另有 '+(alerts.length-items.length)+' 条未显示，详见看板「全局风险预警专区」', padX, y+22);
+  g.fillText('红＝严重（双指标超阈值）· 黄＝关注（单指标超阈值）· 蓝＝提示　·　生成时间：'+new Date().toLocaleString('zh-CN'), padX, y+(alerts.length>items.length&&items.length? 44 : 22));
   return cv.toDataURL('image/png');
 }
 /* 点击「推送企微」→ 打开推送设置弹窗 */
@@ -5659,9 +5788,9 @@ async function alPushRun(panel,cfg,scope,all){
   let chatid=LS.get('pushChat')||(sel&&sel.value)||'';
   if(!chatid){ await alPushLoadChats(true); chatid=(sel&&sel.value)||LS.get('pushChat')||''; }
   if(!chatid){ say('⚠ 未连接到推送服务。'+pushDiagHint(),'err'); return; }
-  // ===== 内容一：预警清单（默认）→ 1 张清单图 + 1 条预警文字 =====
+  // ===== 内容一：预警清单（默认）→ 只发 1 张图（结论 + 明细都在图里，不再发文字）=====
   if(cfg.kind!=='table'){
-    say('正在生成预警清单图…','info');
+    say('正在生成预警清单图（含明细）…','info');
     let dataUrl;
     try{ dataUrl=alertImageDataUrl(); }
     catch(e){ say('❌ 生成预警清单图失败：'+esc(e.message||e),'err'); return; }
@@ -5672,18 +5801,11 @@ async function alPushRun(panel,cfg,scope,all){
         body:JSON.stringify({ chatid:chatid, dataUrl:dataUrl, filename:'alert_list.png' }) });
       const res=await r.json();
       if(!res.ok){ say('❌ 预警清单图推送失败：'+esc(res.error||'未知错误')+(res.code?('（errcode '+res.code+'）'):''),'err'); return; }
-    }catch(e){ say('❌ 无法连接推送服务：'+esc(e.message)+pushDiagHint(),'err'); return; }
-    say('清单图已推送（'+kb+'KB · '+alerts.length+' 条），正在发送预警文字…','info');
-    try{
-      const r=await fetch(pushBase()+'/push',{ method:'POST', mode:'cors', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ chatid:chatid, content:buildAlertPushMarkdown() }) });
-      const res=await r.json();
-      if(res.ok){
-        const nm=(res.push&&res.push.chat_name)||chatid;
-        say('✅ 已推送预警清单（'+esc(String(alerts.length))+' 条）+ 文字到「'+esc(nm)+'」','success');
-        auditLog('企微推送','预警清单 '+alerts.length+' 条 → '+nm);
-      } else say('⚠ 清单图已送达，预警文字推送失败：'+esc(res.error||'未知错误'),'err');
-    }catch(e){ say('⚠ 清单图已送达，预警文字推送失败：'+esc(e.message),'err'); }
+      const nm=(res.push&&res.push.chat_name)||chatid;
+      const ck=(res.push&&res.push.chunks)||1;
+      say('✅ 已推送预警清单（'+alerts.length+' 条 · 结论+明细）到「'+esc(nm)+'」（'+kb+'KB · '+ck+' 分片）','success');
+      auditLog('企微推送','预警清单 '+alerts.length+' 条 → '+nm);
+    }catch(e){ say('❌ 无法连接推送服务：'+esc(e.message)+pushDiagHint(),'err'); }
     return;
   }
   const bs=(cfg.batches||[]).filter(Boolean);
@@ -5959,18 +6081,22 @@ function genAlertReport(){
 }
 
 /* ============================================================
-   渲染 · 项目对比
-   ============================================================ */
-/* ============================================================
-   转化数据播报（2026-09-15 新增板块）
+   转化数据播报（第 10 个板块；2026-09-15 二次改造）
    ------------------------------------------------------------
-   与「预警洞察」的边界：预警＝异常监控（口径＝营期大盘）；
-   播报＝常态分层业绩呈现（口径＝营期分层 + 城市归属）。
-   表：多级表头 · 23 列；行：营期大盘 → 负责人 → 经理 → 主管 → 组长 → 教练。
-   DAY 列规则：固定带「转化DAY 1」，另加「该营期阶段所在 Day」（如 Day6）；
-               每组 2 列 = 当天单产 + 当天转化率。
+   ★ 表：多级表头 24 列 = 排名指标(排名 / vs 大盘产值) 2
+        + 基础信息(维度·营期·负责人·经理·主管·组长·教练·班级ID·阶段) 9
+        + 总转化数据(原始人数·总尾款人数·直播间尾款人数·私聊尾款人数·尾款转化率·
+                     直播间尾款转化率·个销尾款转化率·个销占比·总单产) 9
+        + 转化DAY 1 / 阶段所在DAY（每组 2 列：当天单产 + 当天尾款转化率）
+   ★ 行顺序（自上而下）：教练 → 组长 → 主管 → 经理 → 负责人（已去掉「营期大盘」行）
+   ★ 「vs 大盘产值」＝该行总产值相对「其所属负责人合计产值」的偏差；
+        负责人行自身即本团队基准 → 显示「基准」。基准恒按全量算（不随层级筛选漂移）。
+   ★ 口径：DAY 列＝该 DAY 当日新增（D{n}产值 已含低价 ×0.055 折算）；个销＝私聊。
    ============================================================ */
-const BC_LEVELS=[OWNER,'经理','主管','组长','教练'];
+const BC_LEVELS=[OWNER,'经理','主管','组长','教练'];            // 层级列（表头顺序）
+const BC_ROW_ORDER=['教练','组长','主管','经理',OWNER];          // 行顺序（自下而上）
+const BC_HEAD_BASE=['维度','营期','负责人','经理','主管','组长','教练','班级ID','阶段'];
+const BC_HEAD_MAIN=['原始人数','总尾款人数','直播间尾款人数','私聊尾款人数','尾款转化率','直播间尾款转化率','个销尾款转化率','个销占比','总单产'];
 const BC_CITY_BY_OWNER={'石二强':'北京'};     // 固定映射；未列出的负责人一律深圳
 const BC_DEFAULT_CITY='深圳';
 function bcCity(owner){ return BC_CITY_BY_OWNER[owner] || BC_DEFAULT_CITY; }
@@ -5987,95 +6113,184 @@ function bcDayCols(rr){
   if(d0!=null && d0>1) list.push(Math.min(d0,14));
   return list;
 }
-/* 分层行模型 */
+/* 该营期的品类：只有一个品类就写它，混合才写「全部品类」
+   ★ 不再直接用顶部筛选的 state.cat —— 切项目/链路会把 state.cat 清空，
+     导致「播大课却写成全部品类」的错位。 */
+function bcCatOf(scopeRows, batch){
+  const rr=(scopeRows||[]).filter(r=>(r['营期数']||'')===batch);
+  const cats=distinct(rr, r=>r._cat).filter(Boolean);
+  return cats.length===1? cats[0] : '';
+}
+function bcCatText(scopeRows, batch){ const c=bcCatOf(scopeRows,batch); return c? catName(c) : '全部品类'; }
+/* 负责人大盘（基准行）：按负责人聚合该营期全部行（与层级筛选无关） */
+function bcOwnerAgg(scopeRows, batch){
+  const rr=(scopeRows||[]).filter(r=>(r['营期数']||'')===batch);
+  const col=dimColOf(OWNER); const map={};
+  distinct(rr, r=>r[col]).filter(Boolean).forEach(o=>{ map[o]=bcM(rr.filter(r=>(r[col]||'')===o)); });
+  return map;
+}
+/* 分层行模型（无营期大盘行；行序自下而上） */
 function bcRowsOf(scopeRows, batch, layer){
   const rr=batch? scopeRows.filter(r=>(r['营期数']||'')===batch) : scopeRows.slice();
   const out=[];
-  out.push({ dim:'营期大盘', name:'', rows:rr, rank:null, info:{} });
-  BC_LEVELS.forEach(d=>{
+  BC_ROW_ORDER.forEach(d=>{
     if(layer && layer!=='全部层级' && d!==layer) return;
     const col=dimColOf(d);
     const g=rr.filter(r=>(r[col]||'')!=='');
     if(!g.length) return;
-    const arr=distinct(g,r=>r[col]).map(n=>{
-      const rows2=g.filter(r=>r[col]===n); const r0=rows2[0]||{};
-      const info={};
-      BC_LEVELS.forEach((dd,j)=>{ if(dd===d) info[dd]=n; else info[dd]=r0[dimColOf(dd)]||''; });
-      return { dim:d, name:n, rows:rows2, info:info, classid:BC_LEVELS.indexOf(d)===BC_LEVELS.length-1 ? (r0['班级id']||'') : '' };
+    const arr=distinct(g, r=>r[col]).map(nm=>{
+      const rows2=g.filter(r=>r[col]===nm); const r0=rows2[0]||{};
+      const info={}; BC_LEVELS.forEach(dd=>{ info[dd]=(dd===d? nm : (r0[dimColOf(dd)]||'')); });
+      return { dim:d, name:nm, rows:rows2, info:info, owner:info[OWNER]||'', rank:null,
+        classid:(d===BC_LEVELS[BC_LEVELS.length-1])? (r0['班级id']||'') : '',
+        stage:String(r0['阶段']||'').trim() };
     });
+    // ★ 组内按总单产降序（第 1 名在最上）后再拼进 out —— 直接对过滤副本排序不会改变行顺序
     arr.sort((a,b)=>bcM(b.rows).val-bcM(a.rows).val);
-    arr.forEach((x,i)=>{ x.rank=i+1; out.push(x); });
+    arr.forEach((x,i)=>{ x.rank=i+1; });
+    arr.forEach(x=>out.push(x));
   });
   return out;
+}
+/* 「vs 大盘产值」：非负责人行 → vs 所属负责人；负责人行 → 自身即基准（返回 null） */
+function bcVs(row, ownerAgg){
+  if(row.dim===OWNER) return null;
+  const b=ownerAgg[row.owner];
+  if(!b || !b.val) return null;
+  return (bcM(row.rows).val-b.val)/b.val*100;
+}
+/* ---------- 排名状态：人力侧规则，尚未定义 → 先留可配置位 ----------
+   存储：LS bcRankCfg = { up, down, link:{ '梓洋L2Y':{up,down} } }
+   规则未填写时 configured=false，表内该列只显示产值偏差百分比。 */
+function bcRankCfg(){
+  let c={};
+  try{ c=JSON.parse(LS.get('bcRankCfg')||'{}')||{}; }catch(e){ c={}; }
+  const out={ up:null, down:null, link:(c.link&&typeof c.link==='object')?c.link:{} };
+  ['up','down'].forEach(k=>{ const v=parseFloat(c[k]); if(!isNaN(v)&&v>0) out[k]=v; });
+  return out;
+}
+function bcRankRule(link){
+  const c=bcRankCfg(); const lk=(c.link&&c.link[link])||null;
+  const r={ up:c.up, down:c.down };
+  if(lk){ ['up','down'].forEach(k=>{ const v=parseFloat(lk[k]); if(!isNaN(v)&&v>0) r[k]=v; }); }
+  r.configured=!!(r.up||r.down);
+  return r;
+}
+function ensureBcExtras(){
+  const mod=$('#mod-broadcast'); if(!mod || $('#bcRankCard')) return;
+  const card=document.createElement('div');
+  card.className='card'; card.id='bcRankCard'; card.style.marginBottom='14px';
+  card.innerHTML='<div class="card-t"><h3>排名规则配置（预留）</h3><span class="sub" id="bcRankScope"></span>'
+    +'<span class="spacer"></span><button class="btn sm" id="bcRankReset" style="display:none">恢复默认</button>'
+    +'<button class="btn sm pri" id="bcRankSave">保存</button></div>'
+    +'<div id="bcRankBox"></div><div id="bcRankMsg" style="font-size:12px;color:var(--dim);margin-top:6px"></div>';
+  const t=$('#bcTable'); const anchor=(t&&t.closest)? t.closest('.card') : null;
+  if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(card, anchor); else mod.appendChild(card);
+  renderBcRankCfg();
+}
+function renderBcRankCfg(){
+  const box=$('#bcRankBox'); if(!box) return;
+  const c=bcRankCfg(); const lk=(c.link&&c.link[state.link])||{};
+  const val=k=>{ const v=(lk[k]!=null&&lk[k]!=='')? lk[k] : ((c[k]!=null)? c[k] : ''); return v==null?'':v; };
+  const sc=$('#bcRankScope'); if(sc) sc.textContent='跟随链路：'+(state.link||'—')+'（可只为本链路单独覆盖）';
+  box.innerHTML='<div style="font-size:12px;color:var(--dim);line-height:1.8;margin-bottom:10px">'
+    +'「排名状态」是人力侧的口径需求，判定规则尚未确定 → 这里先留配置位。规则留空时，表内该列显示 <b>「vs 大盘产值」</b>（相对所属负责人合计产值的偏差）。'
+    +'<br>规则就绪后：产值偏差高于「涨阈值」标红 ▲、低于「跌阈值」标绿 ▼，其余显示「正常」。</div>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end">'
+    +'<div class="field" style="min-width:155px"><label>涨阈值 %（高于记 ▲）</label><input type="number" id="bcRankUp" min="0" step="0.1" value="'+val('up')+'" placeholder="未启用"></div>'
+    +'<div class="field" style="min-width:155px"><label>跌阈值 %（低于记 ▼）</label><input type="number" id="bcRankDown" min="0" step="0.1" value="'+val('down')+'" placeholder="未启用"></div>'
+    +'<div style="font-size:12px;color:var(--dim);padding-bottom:8px">留空＝不启用该侧判定</div></div>';
+  const rst=$('#bcRankReset');
+  if(rst){
+    const has=(lk.up!=null&&lk.up!=='')||(lk.down!=null&&lk.down!=='');
+    rst.style.display=has?'':'none';
+    rst.onclick=()=>{ const cc=bcRankCfg(); if(cc.link&&cc.link[state.link]) delete cc.link[state.link];
+      LS.set('bcRankCfg',cc); renderBcRankCfg(); renderBroadcast(); toast('已恢复默认排名规则'); };
+  }
+  const sv=$('#bcRankSave');
+  if(sv) sv.onclick=()=>{
+    const up=parseFloat(($('#bcRankUp')||{}).value), dn=parseFloat(($('#bcRankDown')||{}).value);
+    const cc=bcRankCfg(); cc.link=cc.link||{};
+    const o={}; if(!isNaN(up)&&up>0) o.up=up; if(!isNaN(dn)&&dn>0) o.down=dn;
+    if(Object.keys(o).length) cc.link[state.link]=o; else delete cc.link[state.link];
+    LS.set('bcRankCfg',cc);
+    const msg=$('#bcRankMsg');
+    if(msg) msg.innerHTML='<span style="color:#6ee7b7">✅ 已保存（链路 '+esc(state.link||'—')+'）</span>';
+    renderBcRankCfg(); renderBroadcast();
+  };
 }
 /* 主表渲染 */
 function renderBroadcast(){
   const sel=$('#bcBatch'), lay=$('#bcLayer'), body=$('#bcBody'), sub=$('#bcSub');
   if(!body) return;
+  ensureBcExtras();
   const base=filteredRows();
   const bs=distinct(base,r=>r['营期数']).filter(Boolean)
     .sort((a,b)=>(parseInt((b+'').replace(/\D/g,''))||0)-(parseInt((a+'').replace(/\D/g,''))||0));
-  if(!bs.length){ body.innerHTML='<tr><td colspan="23" style="text-align:center;color:var(--dim);padding:24px">请先选择 项目 / 链路 / 品类</td></tr>'; if(sub) sub.textContent=''; return; }
+  if(!bs.length){ body.innerHTML='<tr><td colspan="24" style="text-align:center;color:var(--dim);padding:24px">请先选择 项目 / 链路 / 品类</td></tr>'; if(sub) sub.textContent=''; return; }
   const keep=bs.indexOf(sel.value)>=0? sel.value : bs[0];
   sel.innerHTML=bs.map(b=>'<option value="'+esc(b)+'">'+esc(b)+'</option>').join('');
   sel.value=keep;
   const layer=lay? lay.value : '全部层级';
   const rows=bcRowsOf(base, keep, layer);
-  const bench=bcM(rows[0].rows);                       // 营期大盘 = 排名状态基准
-  const days=bcDayCols(rows[0].rows);
-  const headCols=[]; const groupCols=[];
-  // 分组表头（2 级）
-  const GRP=[['排名指标',2],['基础信息',8],['总转化数据',9]];
-  days.forEach(d=>GRP.push(['转化DAY '+d,2]));
-  let gh='<tr class="bc-g">'+GRP.map(g=>'<th colspan="'+g[1]+'" style="background:#eef3fb;text-align:center">'+esc(g[0])+'</th>').join('')+'</tr>';
-  let ch='<tr>'
-    +'<th>排名</th><th>排名状态</th>'
-    +['维度','营期','负责人','经理','主管','组长','教练','班级ID'].map(x=>'<th>'+x+'</th>').join('')
-    +['原始人数','总尾款人数','直播间付款','私聊付款','总尾款转化率','直播间转化率','个销转化率','个销占比','总单产'].map(x=>'<th>'+x+'</th>').join('')
-    +days.map(()=>'<th>当天单产</th><th>当天转化率</th>').join('')
-    +'</tr>';
-  const head=$('#bcHead'); if(head) head.innerHTML=gh+ch;
-  const cells=[];
-  rows.forEach((g,gi)=>{
-    const m=bcM(g.rows);
-    const isBench=(g.dim==='营期大盘');
-    const dv=bench.val? (m.val-bench.val)/bench.val*100 : 0;
-    let h='<tr class="'+(isBench?'bc-bench':'')+'">';
-    h+='<td>'+(isBench? '—' : g.rank)+'</td>';
-    h+='<td>'+(isBench? '基准' : '<span class="delta '+(dv>=0?'up':'down')+'">'+(dv>=0?'▲ +':'▼ ')+fmt(dv,1)+'%</span>')+'</td>';
+  const ownerAgg=bcOwnerAgg(base, keep);
+  const days=bcDayCols(base.filter(r=>(r['营期数']||'')===keep));
+  const head=$('#bcHead');
+  if(head){
+    const GRP=[['排名指标',2],['基础信息',BC_HEAD_BASE.length],['总转化数据',BC_HEAD_MAIN.length]];
+    days.forEach(d=>GRP.push(['转化DAY '+d,2]));
+    head.innerHTML='<tr class="bc-g">'+GRP.map(x=>'<th colspan="'+x[1]+'" style="background:#eef3fb;text-align:center">'+esc(x[0])+'</th>').join('')+'</tr>'
+      +'<tr>'
+      +['排名','vs 大盘产值'].map(x=>'<th>'+x+'</th>').join('')
+      +BC_HEAD_BASE.map(x=>'<th>'+esc(x)+'</th>').join('')
+      +BC_HEAD_MAIN.map(x=>'<th>'+esc(x)+'</th>').join('')
+      +days.map(()=>'<th>当天单产</th><th>当天尾款转化率</th>').join('')
+      +'</tr>';
+  }
+  const cells=rows.map(g=>{
+    const m=bcM(g.rows); const am=aggMetrics(g.rows);
+    const dv=bcVs(g, ownerAgg); const isOwnerRow=(g.dim===OWNER);
+    let h='<tr'+(isOwnerRow?' style="background:rgba(79,140,255,.10)"':'')+'>';
+    h+='<td>'+(g.rank!=null? g.rank : '—')+'</td>';
+    h+='<td>'+(dv==null? '<span style="color:var(--dim)">基准</span>'
+      : (Math.abs(dv)<0.05? '<span style="color:var(--dim)">持平</span>'
+      : '<span class="delta '+(dv>=0?'up':'down')+'">'+(dv>=0?'▲ +':'▼ ')+fmt(dv,1)+'%</span>'))+'</td>';
     h+='<td>'+esc(g.dim)+'</td><td>'+esc(keep)+'</td>';
-    ['负责人','经理','主管','组长','教练'].forEach(dd=>{ h+='<td>'+esc((g.info&&g.info[dd])||'')+'</td>'; });
+    [OWNER,'经理','主管','组长','教练'].forEach(dd=>{ h+='<td>'+esc((g.info&&g.info[dd])||'')+'</td>'; });
     h+='<td>'+esc(g.classid||'—')+'</td>';
+    h+='<td>'+esc(g.stage||'—')+'</td>';
     h+='<td>'+fmt(m.p,0)+'</td><td>'+fmt(m.orders,0)+'</td><td>'+fmt(m.live,0)+'</td><td>'+fmt(m.chat,0)+'</td>';
     h+='<td>'+fmtPct(m.rate,1)+'</td><td>'+fmtPct(m.liveRate,1)+'</td><td>'+fmtPct(m.chatRate,1)+'</td><td>'+fmtPct(m.chatShare,1)+'</td><td><b>'+fmt(m.val,1)+'</b></td>';
-    const am=aggMetrics(g.rows);
-    days.forEach(d=>{
-      h+='<td>'+fmt(am['D'+d+'产值'],1)+'</td><td>'+fmtPct(am['D'+d+'转率'],1)+'</td>';
-    });
+    days.forEach(d=>{ h+='<td>'+fmt(am['D'+d+'产值'],1)+'</td><td>'+fmtPct(am['D'+d+'转率'],1)+'</td>'; });
     h+='</tr>';
-    cells.push(h);
+    return h;
   });
   body.innerHTML=cells.join('');
   const cm={}; distinct(base.filter(r=>(r['营期数']||'')===keep),r=>dimColOf(OWNER)).filter(Boolean).forEach(o=>{ const c=bcCity(o); cm[c]=(cm[c]||0)+1; });
-  if(sub) sub.textContent=keep+' · '+rows.length+' 行 · DAY 列：'+days.map(d=>'Day '+d).join(' / ')+' · 城市归属：'+Object.keys(cm).map(c=>c+' '+cm[c]+' 人').join('，');
+  if(sub) sub.textContent=keep+' · '+bcCatText(base,keep)+' · '+rows.length+' 行 · DAY 列：'+days.map(d=>'Day '+d).join(' / ')
+    +' · 城市归属：'+Object.keys(cm).map(c=>c+' '+cm[c]+' 人').join('，')
+    +' · vs 大盘产值＝相对所属负责人（全量基准）';
   const rl=$('#bcRefresh'); if(rl) rl.onclick=()=>{ renderBroadcast(); toast('已刷新播报数据'); };
   if(sel) sel.onchange=()=>renderBroadcast();
   if(lay) lay.onchange=()=>renderBroadcast();
   const pb=$('#bcPush'); if(pb) pb.onclick=()=>bcPush(keep, base);
   alPushLoadChats(false);
 }
-/* 播报文字（按你给的话术模板） */
+/* 播报文字（两行）：
+   第 1 行：项目-链路-品类转化播报，数据推送时间：HH:mm
+   第 2 行：营期-城市，低价单产X
+   ★ 品类取该营期实际数据的品类（不再用可能被清空的 state.cat） */
 function bcText(batch, scopeRows, hhmm){
-  const rr=scopeRows.filter(r=>(r['营期数']||'')===batch);
+  const rr=(scopeRows||[]).filter(r=>(r['营期数']||'')===batch);
   const m=bcM(rr);
   const cm={}; distinct(rr,r=>dimColOf(OWNER)).filter(Boolean).forEach(o=>{ const c=bcCity(o); cm[c]=(cm[c]||0)+1; });
   const city=Object.keys(cm).sort((a,b)=>cm[b]-cm[a])[0] || BC_DEFAULT_CITY;
   let hh=hhmm;
   if(!hh){ const d=new Date(); hh=(d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes(); }
-  const catTxt=state.cat||'全部品类';
-  return (state.link||'-')+'-'+catTxt+'播报，数据推送时间：'+hh+' '+batch+'-'+city+'，低价单产'+fmt(m.val,1);
+  return (state.project||'-')+'-'+(state.link||'-')+'-'+bcCatText(scopeRows,batch)+'转化播报，数据推送时间：'+hh
+    +'\n'+batch+'-'+city+'，低价单产'+fmt(m.val,1);
 }
-/* 播报推送：文字 + 整表图 */
+/* 播报推送：整表图 + 播报文字 */
 async function bcPush(batch, scopeRows){
   const msg=$('#bcMsg'); const say=(h,lv)=>{ if(msg){ msg.innerHTML='<span style="color:'+(lv==='err'?'#fca5a5':(lv==='success'?'#6ee7b7':'var(--dim)'))+'">'+h+'</span>'; } };
   const sel=document.querySelector('.al-push-chat[data-panel="bc"]') || $('#alPushChat');
@@ -6100,90 +6315,94 @@ async function bcPush(batch, scopeRows){
     const res=await r.json();
     if(res.ok){
       const nm=(res.push&&res.push.chat_name)||chatid;
-      say('✅ 已推送播报表 + 播报文字到「'+esc(nm)+'」<br><span style="color:var(--dim)">'+esc(txt)+'</span>','success');
+      say('✅ 已推送播报表 + 播报文字到「'+esc(nm)+'」<br><span style="color:var(--dim)">'+esc(txt).replace(/\n/g,'<br>')+'</span>','success');
       auditLog('企微推送','转化数据播报 '+batch+' → '+nm);
     } else say('⚠ 表图已送达，文字推送失败：'+esc(res.error||'未知错误'),'err');
   }catch(e){ say('⚠ 表图已送达，文字推送失败：'+esc(e.message),'err'); }
 }
-/* 播报表 → PNG（多级表头） */
+/* 播报表 → PNG（两级表头 · 24 列 · 列宽按内容自适应 · 全部居中） */
 function bcImageDataUrl(batch, scopeRows){
   const rows=bcRowsOf(scopeRows, batch, '全部层级');
-  const bench=bcM(rows[0].rows);
-  const days=bcDayCols(rows[0].rows);
-  const FONT='"Microsoft YaHei","PingFang SC",-apple-system,sans-serif';
-  const S=2, padX=28, titleH=118, grpH=32, colH=38, rowH=32, footH=70;
-  const cols=[
-    {t:'排名',w:52,a:'right'},{t:'排名状态',w:86,a:'right'},
-    {t:'维度',w:68,a:'left'},{t:'营期',w:62,a:'left'},{t:'负责人',w:60,a:'left'},{t:'经理',w:60,a:'left'},
-    {t:'主管',w:60,a:'left'},{t:'组长',w:64,a:'left'},{t:'教练',w:60,a:'left'},{t:'班级ID',w:82,a:'left'},
-    {t:'原始人数',w:76,a:'right'},{t:'总尾款人数',w:88,a:'right'},{t:'直播间付款',w:88,a:'right'},{t:'私聊付款',w:80,a:'right'},
-    {t:'总尾款转化率',w:98,a:'right'},{t:'直播间转化率',w:98,a:'right'},{t:'个销转化率',w:88,a:'right'},{t:'个销占比',w:80,a:'right'},{t:'总单产',w:78,a:'right'}
-  ];
-  days.forEach(d=>{ cols.push({t:'当天单产',w:82,a:'right',g:'转化DAY '+d}); cols.push({t:'当天转化率',w:88,a:'right',g:'转化DAY '+d}); });
+  const ownerAgg=bcOwnerAgg(scopeRows, batch);
+  const rr=scopeRows.filter(r=>(r['营期数']||'')===batch);
+  const days=bcDayCols(rr);
+  const FONT=BC_FONT;
+  const S=2, padX=34, titleH=146, grpH=34, colH=44, rowH=34, footH=104;
+  const cols=[{t:'排名',g:'排名指标',min:58},{t:'vs 大盘产值',g:'排名指标',min:104}];
+  BC_HEAD_BASE.forEach(t=>cols.push({t:t,g:'基础信息',min:70}));
+  BC_HEAD_MAIN.forEach(t=>cols.push({t:t,g:'总转化数据',min:88}));
+  days.forEach(d=>{ cols.push({t:'当天单产',g:'转化DAY '+d,min:82}); cols.push({t:'当天尾款转化率',g:'转化DAY '+d,min:106}); });
+  const vset=gr=>{
+    const m=bcM(gr.rows); const am=aggMetrics(gr.rows); const dv=bcVs(gr, ownerAgg);
+    const v=[ (gr.rank!=null? String(gr.rank) : '—'),
+      (dv==null? '基准' : (Math.abs(dv)<0.05? '持平' : ((dv>=0?'▲ +':'▼ ')+fmt(dv,1)+'%'))),
+      gr.dim, batch, (gr.info[OWNER]||''), (gr.info['经理']||''), (gr.info['主管']||''), (gr.info['组长']||''), (gr.info['教练']||''),
+      gr.classid||'—', gr.stage||'—',
+      fmt(m.p,0), fmt(m.orders,0), fmt(m.live,0), fmt(m.chat,0),
+      fmtPct(m.rate,1), fmtPct(m.liveRate,1), fmtPct(m.chatRate,1), fmtPct(m.chatShare,1), fmt(m.val,1) ];
+    days.forEach(d=>{ v.push(fmt(am['D'+d+'产值'],1)); v.push(fmtPct(am['D'+d+'转率'],1)); });
+    return v;
+  };
+  const cells=rows.map(vset);
+  const cv=document.createElement('canvas');
+  fitCols(cv.getContext('2d'), cols, cells, {pad:28, headerFont:'bold 13px '+FONT, cellFont:'13px '+FONT});
   const cellW=cols.reduce((a,c)=>a+c.w,0);
   const W=cellW+padX*2;
   const H=titleH+grpH+colH+Math.max(rows.length,1)*rowH+footH;
-  const cv=document.createElement('canvas'); cv.width=W*S; cv.height=H*S;
+  cv.width=Math.round(W*S); cv.height=Math.round(H*S);
   const g=cv.getContext('2d'); g.scale(S,S);
   g.fillStyle='#ffffff'; g.fillRect(0,0,W,H);
-  // 标题
+  const lines=bcText(batch, scopeRows).split('\n');
   g.fillStyle='#1b45c8'; g.fillRect(0,0,W,titleH);
   g.textAlign='left'; g.fillStyle='#ffffff'; g.font='bold 25px '+FONT;
   g.fillText('元析智察 · 转化数据播报', padX, 46);
-  g.font='14px '+FONT; g.globalAlpha=0.95;
-  g.fillText((state.project||'-')+' / '+(state.link||'-')+' / '+(state.cat||'全部品类')+' · '+batch, padX, 74);
-  g.fillText(bcText(batch, scopeRows), padX, 98);
+  g.font='13.5px '+FONT; g.globalAlpha=0.95;
+  g.fillText(lines[0]||'', padX, 74);
+  g.fillText(lines[1]||'', padX, 96);
+  g.font='12.5px '+FONT;
+  g.fillText('共 '+rows.length+' 行　·　阶段 '+((rows[0]&&rows[0].stage)||'—')+'　·　列宽按内容自适应（可横向缩放查看）', padX, 122);
   g.globalAlpha=1;
-  // 两级表头
-  let y=titleH, cx=padX;
-  const groups=[]; cols.forEach(c=>{ const gname=c.g||'__'; if(!groups.length || groups[groups.length-1].n!==gname) groups.push({n:gname,w:0,a:'center'}); groups[groups.length-1].w+=c.w; });
+  let y=titleH;
   g.fillStyle='#eef3fb'; g.fillRect(0,y,W,grpH);
-  cx=padX;
-  groups.forEach(gr=>{ g.textAlign='center'; g.fillStyle='#33415c'; g.font='bold 14px '+FONT;
-    if(gr.n!=='__') g.fillText(gr.n, cx+gr.w/2, y+grpH/2+5);
-    cx+=gr.w; });
-  // 基础信息/排名指标 的组名（用列名分组：前 2 列 + 其后 8 列 + 其余）
-  g.textAlign='center'; g.fillStyle='#33415c'; g.font='bold 14px '+FONT;
-  g.fillText('排名指标', padX+cols[0].w+cols[1].w/2, y+grpH/2+5);
-  g.fillText('基础信息', padX+cols[0].w+cols[1].w+ (cols.slice(2,10).reduce((a,c)=>a+c.w,0))/2, y+grpH/2+5);
-  g.fillText('总转化数据', padX+cols.slice(0,10).reduce((a,c)=>a+c.w,0)+(cols.slice(10,19).reduce((a,c)=>a+c.w,0))/2, y+grpH/2+5);
+  let cx=padX, i=0;
+  while(i<cols.length){
+    const gname=cols[i].g||''; let w=0;
+    while(i<cols.length && (cols[i].g||'')===gname){ w+=cols[i].w; i++; }
+    g.textAlign='center'; g.fillStyle='#33415c'; g.font='bold 13.5px '+FONT;
+    if(gname) g.fillText(gname, cx+w/2, y+grpH/2+5);
+    cx+=w;
+  }
   y+=grpH;
   g.fillStyle='#f7f9fd'; g.fillRect(0,y,W,colH);
-  cx=padX;
-  cols.forEach(c=>{ g.textAlign = c.a==='right'?'right':'left'; g.fillStyle='#33415c'; g.font='bold 13px '+FONT;
-    g.fillText(c.t, c.a==='right'? cx+c.w-8 : cx+8, y+colH/2+5); cx+=c.w; });
+  cx=padX; g.textAlign='center'; g.fillStyle='#33415c'; g.font='bold 12.5px '+FONT;
+  cols.forEach(c=>{ g.fillText(c.t, cx+c.w/2, y+colH/2+5); cx+=c.w; });
   y+=colH;
-  // 数据行
   rows.forEach((gr,gi)=>{
-    const m=bcM(gr.rows); const am=aggMetrics(gr.rows);
-    const isBench=(gr.dim==='营期大盘');
-    const dv=bench.val? (m.val-bench.val)/bench.val*100 : 0;
-    g.fillStyle = isBench? '#eaf2ff' : (gi%2? '#fafbfd':'#ffffff');
+    const vals=cells[gi]; const dv=bcVs(gr, ownerAgg);
+    const isOwnerRow=(gr.dim===OWNER);
+    g.fillStyle = isOwnerRow? '#eaf2ff' : (gi%2? '#fafbfd':'#ffffff');
     g.fillRect(0,y,W,rowH);
-    const vals=[ isBench?'—':String(gr.rank), isBench?'基准':((dv>=0?'▲ +':'▼ ')+fmt(dv,1)+'%'),
-      gr.dim, batch, (gr.info.负责人||''), (gr.info.经理||''), (gr.info.主管||''), (gr.info.组长||''), (gr.info.教练||''), gr.classid||'—',
-      fmt(m.p,0), fmt(m.orders,0), fmt(m.live,0), fmt(m.chat,0),
-      fmtPct(m.rate,1), fmtPct(m.liveRate,1), fmtPct(m.chatRate,1), fmtPct(m.chatShare,1), fmt(m.val,1) ];
-    days.forEach(d=>{ vals.push(fmt(am['D'+d+'产值'],1)); vals.push(fmtPct(am['D'+d+'转率'],1)); });
     cx=padX;
     cols.forEach((c,ci)=>{
-      g.textAlign = c.a==='right'?'right':'left';
-      const tx = c.a==='right'? cx+c.w-8 : cx+8;
-      const v=String(vals[ci]);
-      if(ci===1 && !isBench){ g.fillStyle = dv>=0? '#ef4444':'#10b981'; g.font='bold 13px '+FONT; }
-      else if(ci===18){ g.fillStyle='#2f6fed'; g.font='bold 13.5px '+FONT; }
-      else { g.fillStyle = isBench? '#0f172a' : '#33415c'; g.font=(isBench?'bold ':'')+'13px '+FONT; }
-      g.fillText(v, tx, y+rowH/2+5);
+      g.textAlign='center';
+      if(ci===1){
+        const flat=(dv==null)||(Math.abs(dv)<0.05);
+        g.fillStyle = flat? '#aab6c8' : (dv>=0? '#ef4444':'#10b981');
+        g.font=(flat?'':'bold ')+'13px '+FONT;
+      }
+      else if(ci===19){ g.fillStyle='#2f6fed'; g.font='bold 13.5px '+FONT; }
+      else { g.fillStyle = isOwnerRow? '#0f172a' : '#33415c'; g.font=(isOwnerRow?'bold ':'')+'13px '+FONT; }
+      g.fillText(String(vals[ci]), cx+c.w/2, y+rowH/2+5);
       cx+=c.w;
     });
     g.strokeStyle='#e8eef7'; g.lineWidth=1; g.beginPath(); g.moveTo(0,y+rowH); g.lineTo(W,y+rowH); g.stroke();
     y+=rowH;
   });
-  // 页脚
   g.textAlign='left'; g.fillStyle='#8b9bb4'; g.font='12.5px '+FONT;
-  g.fillText('总单产＝流水 / 原始人数 × 单产系数（低价链路 ×0.055）　·　当天单产/当天转化率＝该 DAY 当日新增口径　·　排名状态＝相对营期大盘的产值偏差', padX, y+28);
-  g.fillText('生成时间：'+new Date().toLocaleString('zh-CN'), padX, y+50);
-  g.textAlign='right'; g.fillText('元析智察 · 教育转化监测工作台', W-padX, y+50);
+  g.fillText('vs 大盘产值＝该行总产值相对「所属负责人合计产值」的偏差（▲红 高于 · ▼绿 低于）；负责人行即本团队基准', padX, y+28);
+  g.fillText('总单产＝流水 / 原始人数 × 单产系数（低价链路 ×0.055）　·　当天单产 / 当天尾款转化率＝该 DAY 当日新增口径　·　个销＝私聊', padX, y+50);
+  g.fillText('生成时间：'+new Date().toLocaleString('zh-CN'), padX, y+76);
+  g.textAlign='right'; g.fillText('元析智察 · 教育转化监测工作台', W-padX, y+76);
   return cv.toDataURL('image/png');
 }
 
