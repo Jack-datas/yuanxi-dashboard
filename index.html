@@ -3899,7 +3899,7 @@ async function pTest(){
     const j=await r.json();
     if(j.ok) pMsg('✅ 测试消息已发送到「'+esc((j.push&&j.push.chat_name)||'')+'」','success');
     else pMsg('❌ '+(esc(j.error)||'发送失败'),'err');
-  }catch(e){ pMsg('❌ 无法连接推送服务：'+esc(e.message),'err'); }
+  }catch(e){ pMsg('❌ 无法连接推送服务：'+esc(e.message)+pushDiagHint(true),'err'); }
 }
 /* 按弹窗配置算出与页面同一套排名（复用 aggMetrics + 头部20/中上30/中下30/尾部20 档位） */
 function rankItemsFor(cfg){
@@ -3972,7 +3972,7 @@ async function pushNow(){
       pMsg(html,'err');
     }
   }catch(e){
-    pMsg('❌ 无法连接推送服务：'+esc(e.message)+'<br>请确认本机已运行 push_service/start_push.bat','err');
+    pMsg('❌ 无法连接推送服务：'+esc(e.message)+pushDiagHint(),'err');
   }
 }
 
@@ -4097,7 +4097,7 @@ async function pushImageNow(){
       pMsg(html,'err');
     }
   }catch(e){
-    pMsg('❌ 无法连接推送服务：'+esc(e.message)+'<br>请确认本机已运行 push_service/start_push.bat','err');
+    pMsg('❌ 无法连接推送服务：'+esc(e.message)+pushDiagHint(),'err');
   }
 }
 
@@ -4921,6 +4921,26 @@ function renderAlert(){
    目标群从服务 /chats 拉取（LS: pushChat 记住所选 chatid）
    ============================================================ */
 function pushBase(){ return String(LS.get('pushBase')||'http://127.0.0.1:8899').replace(/\/+$/,''); }
+/* 是否运行在「公网页面」上（https 且非 localhost）—— Chrome 138+ 的「本地网络访问权限(LNA)」
+   会拦截公网页面 → 本机 127.0.0.1 的请求（报 blocked by CORS policy: Permission was denied
+   for this request to access the `loopback` address space）。此时失败原因不是「服务没启动」，
+   提示必须区分开，否则会误导排查方向。实测：file:// 与 http://127.0.0.1 打开均可正常推送。 */
+function isPublicOrigin(){
+  if(location.protocol!=='https:') return false;
+  return !/^(localhost|127\.0\.0\.1|\[::1\]|::1)$/i.test(location.hostname);
+}
+function pushDiagHint(short){
+  if(isPublicOrigin()) return short
+    ? '浏览器拦截了「公网网页 → 本机服务」的请求（Chrome 本地网络访问权限）。<b>请改为本机打开看板再推送</b>（双击 HTML 文件，或 localhost）；线上链接只用于查看/分享。'
+    : '<br><b>原因：</b>浏览器不允许<b>公网网页</b>访问本机服务（Chrome 的「本地网络访问权限」拦截了 <code>'+esc(location.origin)+'</code> → <code>'+esc(pushBase())+'</code>）。<br>→ <b>解决办法：在本机打开看板再推送</b>（直接双击 HTML 文件，或用 localhost 打开）。线上链接只用于查看与分享。';
+  return '<br>请确认本机已运行 <b>push_service/start_push.bat</b>，且目标群已 @ 过一次机器人。';
+}
+function pushWarnBanner(){
+  if(!isPublicOrigin()) return '';
+  return '<div style="border:1px solid #f59e0b;background:rgba(245,158,11,.12);color:#fbbf24;border-radius:9px;padding:9px 12px;font-size:12px;line-height:1.7;margin-bottom:10px">'
+    +'⚠ 当前是<b>线上页面</b>：浏览器会拦截「公网网页 → 本机推送服务」的请求（Chrome 本地网络访问权限）。<br>'
+    +'推送请改用<b>本机打开</b>的看板（双击 HTML 文件，或 localhost 打开）。</div>';
+}
 function setPushMsg(html,lv){
   const el=$('#alPushMsg'); if(!el) return;
   const color = lv==='err' ? '#fca5a5' : (lv==='success' ? '#6ee7b7' : 'var(--dim)');
@@ -4947,6 +4967,8 @@ function renderPushCard(){
   const rl=$('#alPushReload'); if(rl) rl.onclick=()=>alPushLoadChats(true);
   const ts=$('#alPushTest'); if(ts) ts.onclick=alPushTest;
   const sd=$('#alPushSend'); if(sd) sd.onclick=alPushSend;
+  const subEl=$('#alPushSub');
+  if(subEl && isPublicOrigin()) subEl.innerHTML='<span style="color:#fbbf24">⚠ 公网页面：浏览器会拦截本机推送服务，请改用本机打开的看板推送</span>';
   // 会话列表由 renderAlert 统一拉取（保证底部卡 + 面板内下拉同时到位），此处不再重复请求
 }
 /* 拉取已知会话（群/单聊）→ 填充所有「目标群」下拉（底部推送卡 + 预警洞察两个面板的就近下拉） */
@@ -4975,8 +4997,8 @@ async function alPushLoadChats(verbose){
   }catch(e){
     const html='<option value="">（未连接推送服务）</option>';
     targets.forEach(t=>t.innerHTML=html);
-    if(sub) sub.textContent='未检测到推送服务（'+pushBase()+'）';
-    if(verbose) setPushMsg('❌ 无法连接 '+pushBase()+'<br>请先在本机运行 push_service/start_push.bat','err');
+    if(sub) sub.textContent=isPublicOrigin()? '公网页面无法访问本机服务 → 请改用本机打开的看板' : ('未检测到推送服务（'+pushBase()+'）');
+    if(verbose) setPushMsg('❌ 无法连接 '+pushBase()+pushDiagHint(),'err');
   }
 }
 /* 把选中的 chatid 同步到所有「目标群」下拉（含预警洞察面板内的就近下拉） */
@@ -5062,7 +5084,7 @@ async function alPushSend(){
     const j=await r.json();
     if(j.ok){ setPushMsg('✅ 已推送到「'+((j.push&&j.push.chat_name)||chatid)+'」','success'); auditLog('企微推送','预警日报 → '+((j.push&&j.push.chat_name)||chatid)); }
     else setPushMsg('❌ 推送失败：'+esc(j.error||'未知错误')+(j.code?('（errcode '+j.code+'）'):''),'err');
-  }catch(e){ setPushMsg('❌ 无法连接推送服务：'+esc(e.message)+'<br>请确认本机已运行 push_service/start_push.bat','err'); }
+  }catch(e){ setPushMsg('❌ 无法连接推送服务：'+esc(e.message)+pushDiagHint(),'err'); }
 }
 async function alPushTest(){
   setPushMsg('正在发送测试…');
@@ -5072,7 +5094,7 @@ async function alPushTest(){
     const j=await r.json();
     if(j.ok) setPushMsg('✅ 测试消息已发送到「'+esc((j.push&&j.push.chat_name)||'')+'」','success');
     else setPushMsg('❌ '+(esc(j.error)||'发送失败'),'err');
-  }catch(e){ setPushMsg('❌ 无法连接推送服务：'+esc(e.message),'err'); }
+  }catch(e){ setPushMsg('❌ 无法连接推送服务：'+esc(e.message)+pushDiagHint(true),'err'); }
 }
 
 /* ============================================================
@@ -5393,7 +5415,7 @@ function alPushSummary(panel){
   const cfg=alPushCfgGet();
   if(cfg.range!=='manual') cfg.batches=auto;
   else { cfg.batches=cfg.batches.filter(b=>meta.some(m=>m.batch===b)); if(!cfg.batches.length) cfg.batches=auto; }
-  const html=''
+  const html=pushWarnBanner()
     +'<div style="font-size:12px;color:var(--dim);line-height:1.8;margin-bottom:10px">数据范围：<b>'+esc(state.project||'-')+' / '+esc(state.link||'-')+' / '+esc(isAllCat()?'全部品类':catName(state.cat))+'</b>'
       +'　·　面板：'+(isAct?'转化中营期':'已结束营期')+'　·　可选营期 '+meta.length+' 个</div>'
     +'<div class="field"><label>播报范围</label><div class="seg" id="puRange">'
@@ -5452,7 +5474,7 @@ async function alPushRun(panel,cfg,scope,all){
   const sel=document.querySelector('.al-push-chat[data-panel="'+panel+'"]') || $('#alPushChat');
   let chatid=LS.get('pushChat')||(sel&&sel.value)||'';
   if(!chatid){ await alPushLoadChats(true); chatid=(sel&&sel.value)||LS.get('pushChat')||''; }
-  if(!chatid){ say('⚠ 未连接到推送服务：请在本机运行 <b>push_service/start_push.bat</b>；若群列表为空，请先在目标群 @ 一次机器人','err'); return; }
+  if(!chatid){ say('⚠ 未连接到推送服务。'+pushDiagHint(),'err'); return; }
   const bs=(cfg.batches||[]).filter(Boolean);
   if(!bs.length){ say('⚠ 未选择营期（或该范围无可播报营期）','err'); return; }
   const scopeF=scope.filter(r=>alNameHit(r, isAct?alActName:alDoneName));
@@ -5482,7 +5504,7 @@ async function alPushRun(panel,cfg,scope,all){
       const res=await r.json();
       if(!res.ok){ say('❌ 「'+esc(j.label)+'」图片推送失败：'+esc(res.error||'未知错误')+(res.code?('（errcode '+res.code+'）'):'')+(res.code===850002?'<br><b>缺少消息权限：</b>请让机器人在该会话中先收到过用户消息。':''),'err'); return; }
       ok++;
-    }catch(e){ say('❌ 无法连接推送服务：'+esc(e.message)+'<br>请确认本机已运行 push_service/start_push.bat','err'); return; }
+    }catch(e){ say('❌ 无法连接推送服务：'+esc(e.message)+pushDiagHint(),'err'); return; }
     if(i<jobs.length-1) await new Promise(rs=>setTimeout(rs,1200));   // 限速（服务端 30 条/分钟）
   }
   // 文字分析（一条，覆盖本次播报的全部营期）
