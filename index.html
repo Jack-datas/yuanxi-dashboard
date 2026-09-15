@@ -832,7 +832,7 @@ MOD_TEMPLATES['alert']="<div class=\"mod\" id=\"mod-alert\">\n<div class=\"page-
 MOD_TEMPLATES['projCompare']="<div class=\"mod\" id=\"mod-projCompare\">\n        <div class=\"page-head\"><h2>项目对比</h2><span class=\"desc\">不同项目月度大盘数据对比 · 输出结论</span></div>\n        <div class=\"filterbar\">\n          <div class=\"fld\"><label>项目 A</label><select id=\"pcA\"></select></div>\n          <div class=\"fld\"><label>项目 B</label><select id=\"pcB\"></select></div>\n          <div class=\"fld\"><label>品类</label><select id=\"pcCate\"><option>全部品类</option><option>电商数据</option><option>大课数据</option></select></div>\n        </div>\n        <div class=\"grid g2\">\n          <div class=\"card\"><div class=\"card-t\"><h3>月度大盘对比</h3><span class=\"spacer\"></span><div class=\"legend\" id=\"pcLegend\"></div></div><div class=\"chartbox\" id=\"pcChart\" style=\"height:300px\"></div></div>\n          <div class=\"card\"><div class=\"card-t\"><h3>对比结论</h3></div><div id=\"pcConcl\" style=\"font-size:13px;color:#c7d3e6;line-height:1.9\"></div></div>\n        </div>\n        <div class=\"card\"><div class=\"card-t\"><h3>项目大盘指标对比明细</h3></div><div class=\"tbl-wrap\" id=\"pcTable\" style=\"max-height:360px\"></div></div>\n      </div>";
 MOD_TEMPLATES['ai']="<div class=\"mod\" id=\"mod-ai\">\n        <div class=\"page-head\"><h2>AI 智能分析报告</h2><span class=\"desc\">基于当前筛选数据自动生成业务结论</span><span class=\"spacer\"></span><button class=\"btn pri\" id=\"aiRun\">重新分析</button></div>\n        <div class=\"grid g12\">\n          <div class=\"card\"><div class=\"card-t\"><h3>分析结论</h3><span class=\"sub\" id=\"aiScope\"></span></div><div id=\"aiResult\"><div class=\"ai-loading\"><div class=\"ai-spinner\"></div>AI 正在分析数据...</div></div></div>\n          <div class=\"card\"><div class=\"card-t\"><h3>关键指标快照</h3></div><div id=\"aiKpi\" class=\"chartbox\" style=\"height:320px\"></div></div>\n        </div>\n        <div class=\"card\"><div class=\"card-t\"><h3>异常点位清单</h3><span class=\"sub\">偏高/偏低/趋势异常</span></div><div class=\"tbl-wrap\" id=\"aiAnomaly\" style=\"max-height:360px\"></div></div>\n      </div>";
 MOD_TEMPLATES['sys']="<div class=\"mod\" id=\"mod-sys\">\n        <div class=\"page-head\"><h2>系统管理</h2><span class=\"desc\">数据上传 · 权限管理 · 数据中心</span></div>\n        <div class=\"tabbar\" data-tabs>\n          <div class=\"tab active\" data-sub=\"upload\">数据上传</div>\n          <div class=\"tab\" data-sub=\"perm\">权限管理</div>\n          <div class=\"tab\" data-sub=\"settings\">数据中心/设置</div>\n        </div>\n        <div class=\"subpanel show\" data-sub=\"upload\">\n          <div class=\"grid g12\">\n            <div class=\"card\">\n              <div class=\"card-t\"><h3>导入数据</h3></div>\n              <div style=\"font-size:12px;color:var(--dim);line-height:1.8;margin-bottom:12px\">上传 <b>.xlsx/.xls</b> 工作簿（或 <b>项目-链路-品类.csv</b>），工作簿内每个 sheet 命名为 <b>项目-链路-品类</b>（如 <b>声音-L4-电商数据</b>、<b>朗诵-L3-大课数据</b>），系统自动识别并按 sheet 覆盖合并，无需手动指定品类。字段与「声音-L4」模板一致（首行为表头）。</div>\n              <div class=\"field\"><label>上传文件（Excel 多 sheet 自动识别）</label><input type=\"file\" id=\"upFile\" accept=\".xlsx,.xls,.csv,.json,.txt\" style=\"padding:10px;border:1px dashed var(--line2);background:var(--bg2);border-radius:9px\"></div>\n              <button class=\"btn pri\" id=\"upDo\" style=\"width:100%;justify-content:center\">解析并导入</button>\n              <div id=\"upResult\" style=\"margin-top:12px;font-size:12px\"></div>\n            </div>\n            <div class=\"card\">\n              <div class=\"card-t\"><h3>API 自动取数（预留接口）</h3></div>\n              <div style=\"font-size:13px;color:#c7d3e6;line-height:1.9\">系统预留后端数据同步接口，后期对接业务系统后自动同步全项目、全链路数据。</div>\n              <div class=\"field\" style=\"margin-top:14px\"><label>API 地址</label><input id=\"apiUrl\" placeholder=\"https://api.yuanxi.example.com/v1/export\" style=\"font-size:13px\"></div>\n              <div class=\"field\"><label>鉴权 Token</label><input id=\"apiToken\" type=\"password\" placeholder=\"Bearer Token\" style=\"font-size:13px\"></div>\n              <div style=\"font-size:12px;color:var(--dim);margin-top:6px\">接口约定：GET /v1/export?project=声音&link=L4&category=电商品&month=1月 返回 JSON 数组。</div>\n              <button class=\"btn\" id=\"apiTest\" style=\"width:100%;justify-content:center;margin-top:12px\">测试连接（预留）</button>\n            </div>\n          </div>\n        </div>\n        <div class=\"subpanel\" data-sub=\"perm\">\n          <div class=\"tabbar tabbar-sub\" id=\"permTabs\">\n            <div class=\"tab active\" data-ptab=\"accounts\">账号与权限</div>\n            <div class=\"tab\" data-ptab=\"fields\">字段权限</div>\n            <div class=\"tab\" data-ptab=\"audit\">审计日志</div>\n          </div>\n          <div id=\"permAccounts\">\n            <div class=\"grid g2\">\n              <div class=\"card\"><div class=\"card-t\"><h3>账号列表</h3><span class=\"sub\">仅管理员可配置 · 项目/链路支持多选</span></div><div class=\"tbl-wrap\" id=\"accList\" style=\"max-height:360px\"></div></div>\n              <div class=\"card\"><div class=\"card-t\"><h3>新增账号</h3></div>\n                <div class=\"field\"><label>账号</label><input id=\"accName\" placeholder=\"登录账号\"></div>\n                <div class=\"field\"><label>姓名</label><input id=\"accReal\" placeholder=\"真实姓名（须与数据中姓名一致，用于行级权限）\"></div>\n                <div class=\"field\"><label>登录密码</label><input id=\"accPwd\" type=\"text\" placeholder=\"新增时必填（至少 6 位）· 编辑时留空表示不修改\" autocomplete=\"new-password\"></div>\n                <div class=\"field\"><label>角色</label><select id=\"accRole\"><option>课题负责人</option><option>经理</option><option>主管</option><option>组长</option><option>教练</option><option>访客</option><option>管理员</option></select></div>\n                <div class=\"field\"><label>数据可见范围</label><label class=\"chk\"><input type=\"checkbox\" id=\"accOwnerAll\">可查看全部负责人数据（跨负责人 · 对按姓名行级过滤的角色生效）</label></div>\n                <div class=\"field\"><label>项目权限（多选 · 不选=全部）</label><div class=\"perm-multi\" id=\"accProj\"></div></div>\n                <div class=\"field\"><label>链路权限（多选 · 随项目联动）</label><div class=\"perm-multi\" id=\"accLink\"></div></div>\n                <div class=\"field\"><label>管理维度权限（多选 · 不选=全部）</label><div class=\"perm-multi\" id=\"accDim\"></div></div>\n                <div class=\"field\"><label>功能权限</label>\n                  <label class=\"chk\"><input type=\"checkbox\" id=\"accFnView\" checked>查看数据</label>\n                  <label class=\"chk\"><input type=\"checkbox\" id=\"accFnExport\" checked>导出数据</label>\n                  <label class=\"chk\"><input type=\"checkbox\" id=\"accFnUpload\">上传数据</label>\n                  <label class=\"chk\"><input type=\"checkbox\" id=\"accFnConfig\">系统配置</label>\n                </div>\n                <div style=\"display:flex;gap:8px;margin-top:4px\"><button class=\"btn pri\" id=\"accAdd\" style=\"flex:1;justify-content:center\">新增账号</button><button class=\"btn\" id=\"accCancelEdit\" style=\"display:none;flex:1;justify-content:center\">取消编辑</button></div>\n              </div>\n            </div>\n          </div>\n          <div id=\"permFields\" style=\"display:none\">\n            <div class=\"card\"><div class=\"card-t\"><h3>分数据字段权限</h3><span class=\"sub\">按角色控制可见字段（越权字段自动隐藏）</span></div><div class=\"tbl-wrap\" id=\"fieldPermTable\"></div></div>\n          </div>\n          <div id=\"permAudit\" style=\"display:none\">\n            <div class=\"card\"><div class=\"card-t\"><h3>审计日志</h3><span class=\"sub\">操作留痕 · 越权防护</span><span class=\"spacer\"></span><button class=\"btn sm\" id=\"auditClear\">清空日志</button></div><div class=\"tbl-wrap\" id=\"auditTable\" style=\"max-height:420px\"></div></div>\n          </div>\n        </div>\n        <div class=\"subpanel\" data-sub=\"settings\">\n          <div class=\"stats\" id=\"dcStats\"></div>\n          <div class=\"grid g2\">\n            <div class=\"card\"><div class=\"card-t\"><h3>数据备份</h3></div>\n              <div class=\"set-row\"><div class=\"s-info\"><div class=\"s-t\">自动备份提醒</div><div class=\"s-d\">数据达到 30 条时顶部提醒</div></div><div class=\"switch on\" id=\"swBackup\"></div></div>\n              <div style=\"display:flex;gap:10px;margin-top:14px\"><button class=\"btn pri\" id=\"bkExport\" style=\"flex:1;justify-content:center\">导出 JSON</button><button class=\"btn\" id=\"bkExportCsv\" style=\"flex:1;justify-content:center\">导出 CSV</button></div>\n              <div style=\"margin-top:10px\"><input type=\"file\" id=\"bkImport\" accept=\".json\" style=\"width:100%;font-size:12px;padding:8px;border:1px dashed var(--line2);border-radius:8px;background:var(--bg2)\"></div>\n              <button class=\"btn\" id=\"bkRestore\" style=\"width:100%;justify-content:center;margin-top:10px\">导入恢复备份</button>\n              <button class=\"btn danger\" id=\"bkClear\" style=\"width:100%;justify-content:center;margin-top:10px\">清空业务数据</button>\n            </div>\n            <div class=\"card\">\n              <div class=\"card-t\"><h3>版本管理</h3></div><div id=\"verList\" style=\"font-size:13px\"></div>\n              <div class=\"card-t\" style=\"margin-top:16px\"><h3>预警规则配置</h3></div>\n              <div class=\"field\"><label>偏离大盘阈值（%）</label><input id=\"cfgThreshold\" type=\"number\" value=\"20\"></div>\n              <div class=\"field\"><label>趋势连续走低期数</label><input id=\"cfgTrend\" type=\"number\" value=\"2\"></div>\n              <button class=\"btn pri\" id=\"cfgSave\" style=\"width:100%;justify-content:center\">保存配置</button>\n            </div>\n          </div>\n        </div>\n      </div>";
-MOD_TEMPLATES['broadcast']="<div class=\"mod\" id=\"mod-broadcast\">\n<div class=\"page-head\"><h2>转化数据播报</h2><span class=\"desc\">分层业绩大表 · 可出图并推送企微</span><span class=\"spacer\"></span>\n<button class=\"btn\" id=\"bcRefresh\">刷新</button><button class=\"btn pri\" id=\"bcPush\">📤 推送播报</button></div>\n<div class=\"filterbar\">\n<div class=\"fld\"><label>营期</label><select id=\"bcBatch\"></select></div>\n<div class=\"fld\"><label>层级</label><select id=\"bcLayer\"><option>全部层级</option><option>负责人</option><option>经理</option><option>主管</option><option>组长</option><option>教练</option></select></div>\n<div class=\"fld\"><label>目标群</label><select class=\"al-push-chat\" id=\"bcChat\" data-panel=\"bc\" style=\"min-width:150px\"></select></div>\n</div>\n<div class=\"card\"><div class=\"card-t\"><h3>转化数据播报表</h3><span class=\"sub\" id=\"bcSub\"></span></div>\n<div class=\"tbl-wrap\" id=\"bcTable\"><table class=\"data\"><thead id=\"bcHead\"></thead><tbody id=\"bcBody\"></tbody></table></div></div>\n<div id=\"bcMsg\" style=\"font-size:12px;line-height:1.8;margin-top:8px\"></div>\n</div>\n";
+MOD_TEMPLATES['broadcast']="<div class=\"mod\" id=\"mod-broadcast\">\n<div class=\"page-head\"><h2>转化数据播报</h2><span class=\"desc\">分层业绩大表 · 可出图并推送企微</span><span class=\"spacer\"></span>\n<button class=\"btn\" id=\"bcRefresh\">刷新</button><button class=\"btn pri\" id=\"bcPush\">📤 推送播报</button></div>\n<div class=\"filterbar\">\n<div class=\"fld\"><label>营期</label><select id=\"bcBatch\"></select></div>\n<div class=\"fld\"><label>层级</label><select id=\"bcLayer\"><option>全部层级</option><option>营期</option><option>负责人</option><option>经理</option><option>主管</option><option>组长</option><option>教练</option></select></div>\n<div class=\"fld\"><label>目标群</label><select class=\"al-push-chat\" id=\"bcChat\" data-panel=\"bc\" style=\"min-width:150px\"></select></div>\n</div>\n<div class=\"card\"><div class=\"card-t\"><h3>转化数据播报表</h3><span class=\"sub\" id=\"bcSub\"></span></div>\n<div class=\"tbl-wrap\" id=\"bcTable\"><table class=\"data\"><thead id=\"bcHead\"></thead><tbody id=\"bcBody\"></tbody></table></div></div>\n<div id=\"bcMsg\" style=\"font-size:12px;line-height:1.8;margin-top:8px\"></div>\n</div>\n";
 
 /* ---------- 基础工具 ---------- */
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
@@ -6083,14 +6083,16 @@ function genAlertReport(){
 /* ============================================================
    转化数据播报（第 10 个板块；2026-09-15 二次改造）
    ------------------------------------------------------------
-   ★ 表：多级表头 24 列 = 排名指标(排名 / vs 大盘产值) 2
+   ★ 表：多级表头 25 列 = 排名指标(产值排名 / vs 营期大盘产值 / vs 负责人大盘产值) 3
         + 基础信息(维度·营期·负责人·经理·主管·组长·教练·班级ID·阶段) 9
         + 总转化数据(原始人数·总尾款人数·直播间尾款人数·私聊尾款人数·尾款转化率·
                      直播间尾款转化率·个销尾款转化率·个销占比·总单产) 9
         + 转化DAY 1 / 阶段所在DAY（每组 2 列：当天单产 + 当天尾款转化率）
-   ★ 行顺序（自上而下）：教练 → 组长 → 主管 → 经理 → 负责人（已去掉「营期大盘」行）
-   ★ 「vs 大盘产值」＝该行总产值相对「其所属负责人合计产值」的偏差；
-        负责人行自身即本团队基准 → 显示「基准」。基准恒按全量算（不随层级筛选漂移）。
+   ★ 行顺序（自上而下）：教练 → 组长 → 主管 → 经理 → 负责人 → **营期（营期整体，末行）**
+        「维度」列同时支持按「营期」筛选（只看营期整体）。
+   ★ 两个对比列（基准恒按全量算，不随层级筛选漂移）：
+        · vs 营期大盘产值   ＝ 该行产值相对「该营期合计产值」的偏差（营期行自身＝基准）
+        · vs 负责人大盘产值 ＝ 该行产值相对「其所属负责人合计产值」的偏差（负责人行自身＝基准）
    ★ 口径：DAY 列＝该 DAY 当日新增（D{n}产值 已含低价 ×0.055 折算）；个销＝私聊。
    ============================================================ */
 const BC_LEVELS=[OWNER,'经理','主管','组长','教练'];            // 层级列（表头顺序）
@@ -6122,6 +6124,13 @@ function bcCatOf(scopeRows, batch){
   return cats.length===1? cats[0] : '';
 }
 function bcCatText(scopeRows, batch){ const c=bcCatOf(scopeRows,batch); return c? catName(c) : '全部品类'; }
+/* 单产口径文案：仅当该范围为低价链路（LOW_PRICE_LINKS）时才叫「低价单产」，否则「高价单产」
+   —— 原先写死「低价单产」，播 L3/L5 时与实际口径不符（已修）。 */
+function bcLowPrice(rows){
+  const links=distinct(rows||[], r=>r._link||r['链路']).filter(Boolean);
+  return links.length>0 && links.every(l=>LOW_PRICE_LINKS.indexOf((''+l).replace(/-/g,''))>=0);
+}
+function bcValLabel(rows){ return bcLowPrice(rows)? '低价单产' : '高价单产'; }
 /* 负责人大盘（基准行）：按负责人聚合该营期全部行（与层级筛选无关） */
 function bcOwnerAgg(scopeRows, batch){
   const rr=(scopeRows||[]).filter(r=>(r['营期数']||'')===batch);
@@ -6129,11 +6138,14 @@ function bcOwnerAgg(scopeRows, batch){
   distinct(rr, r=>r[col]).filter(Boolean).forEach(o=>{ map[o]=bcM(rr.filter(r=>(r[col]||'')===o)); });
   return map;
 }
-/* 分层行模型（无营期大盘行；行序自下而上） */
+/* 分层行模型：教练→组长→主管→经理→负责人 →「营期」行（末行＝营期整体）
+   layer='营期' 时只出营期行；'全部层级' 出全部。 */
 function bcRowsOf(scopeRows, batch, layer){
   const rr=batch? scopeRows.filter(r=>(r['营期数']||'')===batch) : scopeRows.slice();
   const out=[];
-  BC_ROW_ORDER.forEach(d=>{
+  const onlyBatch=(layer==='营期');
+  const wantLevels=(!layer || layer==='全部层级' || !onlyBatch);
+  if(wantLevels) BC_ROW_ORDER.forEach(d=>{
     if(layer && layer!=='全部层级' && d!==layer) return;
     const col=dimColOf(d);
     const g=rr.filter(r=>(r[col]||'')!=='');
@@ -6150,14 +6162,32 @@ function bcRowsOf(scopeRows, batch, layer){
     arr.forEach((x,i)=>{ x.rank=i+1; });
     arr.forEach(x=>out.push(x));
   });
+  if((!layer || layer==='全部层级' || onlyBatch) && rr.length){
+    const r0=rr[0]||{};
+    out.push({ dim:'营期', name:batch||'', rows:rr, info:{}, owner:'', rank:null, classid:'',
+      stage:String(r0['阶段']||'').trim(), isBatchRow:true });
+  }
   return out;
 }
-/* 「vs 大盘产值」：非负责人行 → vs 所属负责人；负责人行 → 自身即基准（返回 null） */
+/* vs 负责人大盘产值：负责人行自身即基准（null） */
 function bcVs(row, ownerAgg){
-  if(row.dim===OWNER) return null;
+  if(row.isBatchRow || row.dim===OWNER) return null;
   const b=ownerAgg[row.owner];
   if(!b || !b.val) return null;
   return (bcM(row.rows).val-b.val)/b.val*100;
+}
+/* vs 营期大盘产值：营期行自身即基准（null） */
+function bcVsBatch(row, batchM){
+  if(row.isBatchRow) return null;
+  if(!batchM || !batchM.val) return null;
+  return (bcM(row.rows).val-batchM.val)/batchM.val*100;
+}
+/* 对比列取值 → 文本（bench＝该行即基准） */
+function bcVsText(v, bench){
+  if(bench) return '基准';
+  if(v==null) return '—';
+  if(Math.abs(v)<0.05) return '持平';
+  return (v>=0?'▲ +':'▼ ')+fmt(v,1)+'%';
 }
 /* ---------- 排名状态：人力侧规则，尚未定义 → 先留可配置位 ----------
    存储：LS bcRankCfg = { up, down, link:{ '梓洋L2Y':{up,down} } }
@@ -6227,21 +6257,23 @@ function renderBroadcast(){
   const base=filteredRows();
   const bs=distinct(base,r=>r['营期数']).filter(Boolean)
     .sort((a,b)=>(parseInt((b+'').replace(/\D/g,''))||0)-(parseInt((a+'').replace(/\D/g,''))||0));
-  if(!bs.length){ body.innerHTML='<tr><td colspan="24" style="text-align:center;color:var(--dim);padding:24px">请先选择 项目 / 链路 / 品类</td></tr>'; if(sub) sub.textContent=''; return; }
+  if(!bs.length){ body.innerHTML='<tr><td colspan="25" style="text-align:center;color:var(--dim);padding:24px">请先选择 项目 / 链路 / 品类</td></tr>'; if(sub) sub.textContent=''; return; }
   const keep=bs.indexOf(sel.value)>=0? sel.value : bs[0];
   sel.innerHTML=bs.map(b=>'<option value="'+esc(b)+'">'+esc(b)+'</option>').join('');
   sel.value=keep;
   const layer=lay? lay.value : '全部层级';
   const rows=bcRowsOf(base, keep, layer);
   const ownerAgg=bcOwnerAgg(base, keep);
-  const days=bcDayCols(base.filter(r=>(r['营期数']||'')===keep));
+  const keepRows=base.filter(r=>(r['营期数']||'')===keep);
+  const batchM=bcM(keepRows);                                   // 营期大盘（vs 营期大盘产值 的基准）
+  const days=bcDayCols(keepRows);
   const head=$('#bcHead');
   if(head){
-    const GRP=[['排名指标',2],['基础信息',BC_HEAD_BASE.length],['总转化数据',BC_HEAD_MAIN.length]];
+    const GRP=[['排名指标',3],['基础信息',BC_HEAD_BASE.length],['总转化数据',BC_HEAD_MAIN.length]];
     days.forEach(d=>GRP.push(['转化DAY '+d,2]));
     head.innerHTML='<tr class="bc-g">'+GRP.map(x=>'<th colspan="'+x[1]+'" style="background:#eef3fb;text-align:center">'+esc(x[0])+'</th>').join('')+'</tr>'
       +'<tr>'
-      +['排名','vs 大盘产值'].map(x=>'<th>'+x+'</th>').join('')
+      +['产值排名','vs 营期大盘产值','vs 负责人大盘产值'].map(x=>'<th>'+x+'</th>').join('')
       +BC_HEAD_BASE.map(x=>'<th>'+esc(x)+'</th>').join('')
       +BC_HEAD_MAIN.map(x=>'<th>'+esc(x)+'</th>').join('')
       +days.map(()=>'<th>当天单产</th><th>当天尾款转化率</th>').join('')
@@ -6249,12 +6281,16 @@ function renderBroadcast(){
   }
   const cells=rows.map(g=>{
     const m=bcM(g.rows); const am=aggMetrics(g.rows);
-    const dv=bcVs(g, ownerAgg); const isOwnerRow=(g.dim===OWNER);
-    let h='<tr'+(isOwnerRow?' style="background:rgba(79,140,255,.10)"':'')+'>';
+    const dv=bcVs(g, ownerAgg); const bdv=bcVsBatch(g, batchM);
+    const isOwnerRow=(g.dim===OWNER); const isBatchRow=!!g.isBatchRow;
+    const cell=(v,bench)=>{ if(bench) return '<span style="color:var(--dim)">基准</span>';
+      if(v==null) return '<span style="color:var(--dim)">—</span>';
+      if(Math.abs(v)<0.05) return '<span style="color:var(--dim)">持平</span>';
+      return '<span class="delta '+(v>=0?'up':'down')+'">'+(v>=0?'▲ +':'▼ ')+fmt(v,1)+'%</span>'; };
+    let h='<tr'+(isBatchRow?' style="background:rgba(27,69,200,.12);font-weight:600"':(isOwnerRow?' style="background:rgba(79,140,255,.10)"':''))+'>';
     h+='<td>'+(g.rank!=null? g.rank : '—')+'</td>';
-    h+='<td>'+(dv==null? '<span style="color:var(--dim)">基准</span>'
-      : (Math.abs(dv)<0.05? '<span style="color:var(--dim)">持平</span>'
-      : '<span class="delta '+(dv>=0?'up':'down')+'">'+(dv>=0?'▲ +':'▼ ')+fmt(dv,1)+'%</span>'))+'</td>';
+    h+='<td>'+cell(bdv, isBatchRow)+'</td>';
+    h+='<td>'+cell(dv, isOwnerRow)+'</td>';
     h+='<td>'+esc(g.dim)+'</td><td>'+esc(keep)+'</td>';
     [OWNER,'经理','主管','组长','教练'].forEach(dd=>{ h+='<td>'+esc((g.info&&g.info[dd])||'')+'</td>'; });
     h+='<td>'+esc(g.classid||'—')+'</td>';
@@ -6269,7 +6305,7 @@ function renderBroadcast(){
   const cm=bcCityCount(base.filter(r=>(r['营期数']||'')===keep));
   if(sub) sub.textContent=keep+' · '+bcCatText(base,keep)+' · '+rows.length+' 行 · DAY 列：'+days.map(d=>'Day '+d).join(' / ')
     +' · 城市归属：'+Object.keys(cm).map(c=>c+' '+cm[c]+' 人').join('，')
-    +' · vs 大盘产值＝相对所属负责人（全量基准）';
+    +' · 对比基准：vs 营期大盘 ＝ 相对该营期合计；vs 负责人大盘 ＝ 相对所属负责人（均按全量算）';
   const rl=$('#bcRefresh'); if(rl) rl.onclick=()=>{ renderBroadcast(); toast('已刷新播报数据'); };
   if(sel) sel.onchange=()=>renderBroadcast();
   if(lay) lay.onchange=()=>renderBroadcast();
@@ -6278,7 +6314,7 @@ function renderBroadcast(){
 }
 /* 播报文字（单营期＝多营期版本的特例）：
    第 1 行：{项目}-{链路代码}-{品类}转化播报，数据推送时间：HH:mm
-   第 2..n 行：逐个营期一行（营期升序）{营期}-{城市}，低价单产X */
+   第 2..n 行：逐个营期一行（营期升序）{营期}-{城市}，{低价|高价}单产X */
 function bcNowHHmm(){ const d=new Date(); return (d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes(); }
 function bcText(batch, scopeRows, hhmm){ return bcTextMulti([batch], scopeRows, hhmm); }
 /* 城市归属（该范围内出现最多的城市） */
@@ -6308,7 +6344,7 @@ function bcTextMulti(batches, scopeRows, hhmm){
   const lines=[(state.project||'-')+'-'+(state.link||'-')+'-'+cat+'转化播报，数据推送时间：'+(hhmm||bcNowHHmm())];
   bs.forEach(b=>{
     const rr=scope.filter(r=>(r['营期数']||'')===b);
-    lines.push(b+'-'+bcCityOf(rr)+'，低价单产'+fmt(bcM(rr).val,1));
+    lines.push(b+'-'+bcCityOf(rr)+'，'+bcValLabel(rr)+fmt(bcM(rr).val,1));
   });
   return lines.join('\n');
 }
@@ -6353,22 +6389,32 @@ function bcPushModel(base, batches, depth, ownerMode){
     if(!rr.length) return null;
     const col=dimColOf(OWNER);
     const owners=bcOwnersOf(rr);
+    const stage=String((rr[0]||{})['阶段']||'').trim();
+    const batchRow={ dim:'营期', name:b, rows:rr, info:{}, owner:'', rank:null, classid:'',
+      stage:stage, isBatchRow:true };
+    const splitOwners=(ownerMode==='split' && owners.length>0);
     let groups;
-    if(ownerMode==='split' && owners.length){
+    if(splitOwners){
       groups=owners.map(o=>({ owner:o, rows:bcRowsOf(rr.filter(r=>(r[col]||'')===o), b, '全部层级') }));
     } else {
-      groups=[{ owner:'', rows:bcRowsOf(rr, b, '全部层级') }];
+      groups=[{ owner:'', rows:bcRowsOf(rr, b, '全部层级') }];   // 合并模式：营期行已在末尾
     }
-    if(depth==='bench') groups=groups.map(g=>({ owner:g.owner, rows:g.rows.filter(x=>x.dim===OWNER) }));
-    return { batch:b, stage:String((rr[0]||{})['阶段']||'').trim(), days:bcDayCols(rr),
-             groups:groups, ownerAgg:bcOwnerAgg(base, b), rows:rr, nOwn:owners.length };
+    if(depth==='bench'){
+      groups=groups.map(g=>({ owner:g.owner, rows:g.rows.filter(x=>x.dim===OWNER) }));
+      if(!splitOwners) groups=groups.map(g=>({ owner:g.owner, rows:g.rows.concat([batchRow]) }));
+    }
+    return { batch:b, stage:stage, days:bcDayCols(rr), groups:groups,
+             ownerAgg:bcOwnerAgg(base, b), batchM:bcM(rr), batchRow:batchRow,
+             splitOwners:splitOwners, rows:rr, nOwn:owners.length };
   }).filter(Boolean);
 }
 /* 一行 → 单元格文本（nDayG = 全图统一的 DAY 组数，不足补空） */
 function bcRowVals(gr, sec, nDayG){
-  const m=bcM(gr.rows); const am=aggMetrics(gr.rows); const dv=bcVs(gr, sec.ownerAgg);
-  const v=[ (gr.rank!=null? String(gr.rank) : '—'),
-    (dv==null? '基准' : (Math.abs(dv)<0.05? '持平' : ((dv>=0?'▲ +':'▼ ')+fmt(dv,1)+'%'))),
+  const m=bcM(gr.rows); const am=aggMetrics(gr.rows);
+  const dv=bcVs(gr, sec.ownerAgg); const bdv=bcVsBatch(gr, sec.batchM);
+  const v=[ (gr.isBatchRow? '—' : (gr.rank!=null? String(gr.rank) : '—')),
+    bcVsText(bdv, !!gr.isBatchRow),
+    bcVsText(dv, gr.dim===OWNER),
     gr.dim, sec.batch, (gr.info[OWNER]||''), (gr.info['经理']||''), (gr.info['主管']||''), (gr.info['组长']||''), (gr.info['教练']||''),
     gr.classid||'—', gr.stage||'—',
     fmt(m.p,0), fmt(m.orders,0), fmt(m.live,0), fmt(m.chat,0),
@@ -6385,13 +6431,17 @@ function bcPushImageDataUrl(model, cat, titleLine){
   const FONT=BC_FONT;
   const S=2, padX=34, titleH=150, grpH=34, colH=44, rowH=34, secH=36, ownH=30, footH=104;
   const nDayG=Math.max.apply(null, model.map(s=>s.days.length).concat([1]));
-  const cols=[{t:'排名',g:'排名指标',min:58},{t:'vs 大盘产值',g:'排名指标',min:104}];
+  const cols=[{t:'产值排名',g:'排名指标',min:74},
+    {t:'vs 营期大盘产值',g:'排名指标',min:124},{t:'vs 负责人大盘产值',g:'排名指标',min:138}];
   BC_HEAD_BASE.forEach(t=>cols.push({t:t,g:'基础信息',min:70}));
   BC_HEAD_MAIN.forEach(t=>cols.push({t:t,g:'总转化数据',min:88}));
   for(let k=0;k<nDayG;k++){ cols.push({t:'当天单产',min:82}); cols.push({t:'当天尾款转化率',min:106}); }
   // 全图文本并集 → 统一列宽（保证各节对齐）
   const allCells=[];
-  model.forEach(sec=>sec.groups.forEach(gp=>gp.rows.forEach(r=>allCells.push(bcRowVals(r, sec, nDayG)))));
+  model.forEach(sec=>{
+    if(sec.splitOwners && sec.batchRow) allCells.push(bcRowVals(sec.batchRow, sec, nDayG));
+    sec.groups.forEach(gp=>gp.rows.forEach(r=>allCells.push(bcRowVals(r, sec, nDayG))));
+  });
   const cv=document.createElement('canvas');
   fitCols(cv.getContext('2d'), cols, allCells, {pad:28, headerFont:'bold 13px '+FONT, cellFont:'13px '+FONT});
   const cellW=cols.reduce((a,c)=>a+c.w,0);
@@ -6399,6 +6449,7 @@ function bcPushImageDataUrl(model, cat, titleLine){
   let bodyH=0;
   model.forEach(sec=>{
     bodyH+=secH+grpH+colH;
+    if(sec.splitOwners && sec.batchRow) bodyH+=rowH;
     sec.groups.forEach(gp=>{ bodyH+=(gp.owner? ownH:0)+gp.rows.length*rowH; });
   });
   const H=titleH+Math.max(bodyH,rowH)+footH;
@@ -6421,11 +6472,11 @@ function bcPushImageDataUrl(model, cat, titleLine){
     g.fillStyle='#dbeafe'; g.fillRect(0,y,W,secH);
     g.textAlign='left'; g.fillStyle='#1b45c8'; g.font='bold 13.5px '+FONT;
     g.fillText(sec.batch+'　·　阶段 '+(sec.stage||'—')+'　·　负责人 '+(sec.nOwn||1)+' 位　·　共 '+
-      sec.groups.reduce((a,gp)=>a+gp.rows.length,0)+' 行', padX, y+secH/2+5);
+      (sec.rows? sec.rows.length : sec.groups.reduce((a,gp)=>a+gp.rows.length,0))+' 条班级行', padX, y+secH/2+5);
     g.strokeStyle='#bfdbfe'; g.beginPath(); g.moveTo(0,y+secH); g.lineTo(W,y+secH); g.stroke();
     y+=secH;
     // 两级表头（列宽全图统一；本节的 DAY 组名取自本节阶段）
-    const nBase=2+BC_HEAD_BASE.length+BC_HEAD_MAIN.length;
+    const nBase=3+BC_HEAD_BASE.length+BC_HEAD_MAIN.length;
     let cx=padX, i=0;
     g.fillStyle='#eef3fb'; g.fillRect(0,y,W,grpH);
     while(i<cols.length){
@@ -6450,7 +6501,33 @@ function bcPushImageDataUrl(model, cat, titleLine){
     cx=padX; g.textAlign='center'; g.fillStyle='#33415c'; g.font='bold 12.5px '+FONT;
     cols.forEach(c=>{ g.fillText(c.t, cx+c.w/2, y+colH/2+5); cx+=c.w; });
     y+=colH;
-    // 负责人分节 + 行
+    // 行绘制（营期行 / 负责人行 / 层级行）
+    const drawRow=(gr,ri)=>{
+      const vals=bcRowVals(gr, sec, nDayG);
+      const dv=bcVs(gr, sec.ownerAgg); const bdv=bcVsBatch(gr, sec.batchM);
+      const isOwnerRow=(gr.dim===OWNER); const isBatchRow=!!gr.isBatchRow;
+      const strong=(isBatchRow||isOwnerRow);
+      g.fillStyle = isBatchRow? '#e4ecfb' : (isOwnerRow? '#eaf2ff' : (ri%2? '#fafbfd':'#ffffff'));
+      g.fillRect(0,y,W,rowH);
+      cx=padX;
+      cols.forEach((c,ci)=>{
+        g.textAlign='center';
+        if(ci===1||ci===2){
+          const val=(ci===1? bdv : dv);
+          const bench=(ci===1? isBatchRow : isOwnerRow);
+          const flat=bench||(val==null)||(Math.abs(val)<0.05);
+          g.fillStyle = flat? '#aab6c8' : (val>=0? '#ef4444':'#10b981');
+          g.font=(flat?'':'bold ')+'13px '+FONT;
+        } else if(ci===20){ g.fillStyle='#2f6fed'; g.font='bold 13.5px '+FONT; }
+        else { g.fillStyle = strong? '#0f172a' : '#33415c'; g.font=(strong?'bold ':'')+'13px '+FONT; }
+        g.fillText(String(vals[ci]), cx+c.w/2, y+rowH/2+5);
+        cx+=c.w;
+      });
+      g.strokeStyle='#e8eef7'; g.lineWidth=1; g.beginPath(); g.moveTo(0,y+rowH); g.lineTo(W,y+rowH); g.stroke();
+      y+=rowH;
+    };
+    // 分段：按负责人分节时，先把「营期整体」画在表头下方
+    if(sec.splitOwners && sec.batchRow) drawRow(sec.batchRow, 0);
     sec.groups.forEach(gp=>{
       if(gp.owner){
         g.fillStyle='#eef7f2'; g.fillRect(0,y,W,ownH);
@@ -6458,31 +6535,11 @@ function bcPushImageDataUrl(model, cat, titleLine){
         g.fillText('负责人 '+gp.owner+'　·　'+gp.rows.length+' 行', padX, y+ownH/2+5);
         y+=ownH;
       }
-      gp.rows.forEach((gr,ri)=>{
-        const vals=bcRowVals(gr, sec, nDayG); const dv=bcVs(gr, sec.ownerAgg);
-        const isOwnerRow=(gr.dim===OWNER);
-        const isOwnerFirst=(!!gp.owner && isOwnerRow);
-        g.fillStyle = (isOwnerRow||isOwnerFirst)? '#eaf2ff' : (ri%2? '#fafbfd':'#ffffff');
-        g.fillRect(0,y,W,rowH);
-        cx=padX;
-        cols.forEach((c,ci)=>{
-          g.textAlign='center';
-          if(ci===1){
-            const flat=(dv==null)||(Math.abs(dv)<0.05);
-            g.fillStyle = flat? '#aab6c8' : (dv>=0? '#ef4444':'#10b981');
-            g.font=(flat?'':'bold ')+'13px '+FONT;
-          } else if(ci===19){ g.fillStyle='#2f6fed'; g.font='bold 13.5px '+FONT; }
-          else { g.fillStyle = isOwnerRow? '#0f172a' : '#33415c'; g.font=(isOwnerRow?'bold ':'')+'13px '+FONT; }
-          g.fillText(String(vals[ci]), cx+c.w/2, y+rowH/2+5);
-          cx+=c.w;
-        });
-        g.strokeStyle='#e8eef7'; g.lineWidth=1; g.beginPath(); g.moveTo(0,y+rowH); g.lineTo(W,y+rowH); g.stroke();
-        y+=rowH;
-      });
+      gp.rows.forEach((gr,ri)=>drawRow(gr,ri));
     });
   });
   g.textAlign='left'; g.fillStyle='#8b9bb4'; g.font='12.5px '+FONT;
-  g.fillText('vs 大盘产值＝该行总产值相对「所属负责人合计产值」的偏差（▲红 高于 · ▼绿 低于）；负责人行即本团队基准', padX, y+28);
+  g.fillText('vs 营期大盘产值＝相对该营期合计产值；vs 负责人大盘产值＝相对所属负责人合计产值（▲红 高于 · ▼绿 低于）；营期行/负责人行即各自基准', padX, y+28);
   g.fillText('总单产＝流水 / 原始人数 × 单产系数（低价链路 ×0.055）　·　当天单产 / 当天尾款转化率＝该 DAY 当日新增口径　·　个销＝私聊', padX, y+50);
   g.fillText('生成时间：'+new Date().toLocaleString('zh-CN'), padX, y+76);
   g.textAlign='right'; g.fillText('元析智察 · 教育转化监测工作台', W-padX, y+76);
