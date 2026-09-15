@@ -6266,137 +6266,220 @@ function renderBroadcast(){
     return h;
   });
   body.innerHTML=cells.join('');
-  const cm={}; distinct(base.filter(r=>(r['营期数']||'')===keep),r=>dimColOf(OWNER)).filter(Boolean).forEach(o=>{ const c=bcCity(o); cm[c]=(cm[c]||0)+1; });
+  const cm=bcCityCount(base.filter(r=>(r['营期数']||'')===keep));
   if(sub) sub.textContent=keep+' · '+bcCatText(base,keep)+' · '+rows.length+' 行 · DAY 列：'+days.map(d=>'Day '+d).join(' / ')
     +' · 城市归属：'+Object.keys(cm).map(c=>c+' '+cm[c]+' 人').join('，')
     +' · vs 大盘产值＝相对所属负责人（全量基准）';
   const rl=$('#bcRefresh'); if(rl) rl.onclick=()=>{ renderBroadcast(); toast('已刷新播报数据'); };
   if(sel) sel.onchange=()=>renderBroadcast();
   if(lay) lay.onchange=()=>renderBroadcast();
-  const pb=$('#bcPush'); if(pb) pb.onclick=()=>bcPush(keep, base);
+  const pb=$('#bcPush'); if(pb) pb.onclick=()=>bcPushModal(base);   // ★ 改为弹「推送设置」窗
   alPushLoadChats(false);
 }
-/* 播报文字（两行）：
-   第 1 行：项目-链路-品类转化播报，数据推送时间：HH:mm
-   第 2 行：营期-城市，低价单产X
-   ★ 品类取该营期实际数据的品类（不再用可能被清空的 state.cat） */
-function bcText(batch, scopeRows, hhmm){
-  const rr=(scopeRows||[]).filter(r=>(r['营期数']||'')===batch);
-  const m=bcM(rr);
-  const cm={}; distinct(rr,r=>dimColOf(OWNER)).filter(Boolean).forEach(o=>{ const c=bcCity(o); cm[c]=(cm[c]||0)+1; });
-  const city=Object.keys(cm).sort((a,b)=>cm[b]-cm[a])[0] || BC_DEFAULT_CITY;
-  let hh=hhmm;
-  if(!hh){ const d=new Date(); hh=(d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes(); }
-  return (state.project||'-')+'-'+(state.link||'-')+'-'+bcCatText(scopeRows,batch)+'转化播报，数据推送时间：'+hh
-    +'\n'+batch+'-'+city+'，低价单产'+fmt(m.val,1);
+/* 播报文字（单营期＝多营期版本的特例）：
+   第 1 行：{项目}-{链路代码}-{品类}转化播报，数据推送时间：HH:mm
+   第 2..n 行：逐个营期一行（营期升序）{营期}-{城市}，低价单产X */
+function bcNowHHmm(){ const d=new Date(); return (d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes(); }
+function bcText(batch, scopeRows, hhmm){ return bcTextMulti([batch], scopeRows, hhmm); }
+/* 城市归属（该范围内出现最多的城市） */
+/* 各城市的原始人数合计（按负责人归属折算） */
+function bcCityCount(rows){
+  const rr=rows||[]; const col=dimColOf(OWNER); const cm={};
+  distinct(rr, r=>r[col]).filter(Boolean).forEach(o=>{
+    const p=rr.filter(r=>(r[col]||'')===o).reduce((a,r)=>a+(+r['原始人数']||0),0);
+    const c=bcCity(o); cm[c]=(cm[c]||0)+(p||1);
+  });
+  return cm;
 }
-/* 播报推送：整表图 + 播报文字 */
-async function bcPush(batch, scopeRows){
-  const msg=$('#bcMsg'); const say=(h,lv)=>{ if(msg){ msg.innerHTML='<span style="color:'+(lv==='err'?'#fca5a5':(lv==='success'?'#6ee7b7':'var(--dim)'))+'">'+h+'</span>'; } };
-  const sel=document.querySelector('.al-push-chat[data-panel="bc"]') || $('#alPushChat');
-  let chatid=(sel&&sel.value)||LS.get('pushChat')||'';
-  if(!chatid){ await alPushLoadChats(true); chatid=(sel&&sel.value)||LS.get('pushChat')||''; }
-  if(!chatid){ say('⚠ 未连接到推送服务。'+pushDiagHint(),'err'); return; }
-  say('正在生成播报表图…');
-  let dataUrl;
-  try{ dataUrl=bcImageDataUrl(batch, scopeRows); }
-  catch(e){ say('❌ 生成播报表图失败：'+esc(e.message||e),'err'); return; }
-  try{
-    const r=await fetch(pushBase()+'/push-image',{ method:'POST', mode:'cors', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ chatid:chatid, dataUrl:dataUrl, filename:'broadcast.png' }) });
-    const res=await r.json();
-    if(!res.ok){ say('❌ 播报表图推送失败：'+esc(res.error||'未知错误')+(res.code?('（errcode '+res.code+'）'):''),'err'); return; }
-  }catch(e){ say('❌ 无法连接推送服务：'+esc(e.message)+pushDiagHint(),'err'); return; }
-  const txt=bcText(batch, scopeRows);
-  say('表图已推送（'+Math.round(dataUrl.length*0.75/1024)+'KB），正在发送播报文字…');
-  try{
-    const r=await fetch(pushBase()+'/push',{ method:'POST', mode:'cors', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ chatid:chatid, content:txt }) });
-    const res=await r.json();
-    if(res.ok){
-      const nm=(res.push&&res.push.chat_name)||chatid;
-      say('✅ 已推送播报表 + 播报文字到「'+esc(nm)+'」<br><span style="color:var(--dim)">'+esc(txt).replace(/\n/g,'<br>')+'</span>','success');
-      auditLog('企微推送','转化数据播报 '+batch+' → '+nm);
-    } else say('⚠ 表图已送达，文字推送失败：'+esc(res.error||'未知错误'),'err');
-  }catch(e){ say('⚠ 表图已送达，文字推送失败：'+esc(e.message),'err'); }
+/* 主城市（人数最多）：平局时回落到默认城市（深圳） */
+function bcCityOf(rows){
+  const cm=bcCityCount(rows); const ks=Object.keys(cm);
+  if(!ks.length) return BC_DEFAULT_CITY;
+  ks.sort((a,b)=>cm[b]-cm[a]);
+  if(ks.length>1 && cm[ks[0]]===cm[ks[1]]) return BC_DEFAULT_CITY;
+  return ks[0];
 }
-/* 播报表 → PNG（两级表头 · 24 列 · 列宽按内容自适应 · 全部居中） */
-function bcImageDataUrl(batch, scopeRows){
-  const rows=bcRowsOf(scopeRows, batch, '全部层级');
-  const ownerAgg=bcOwnerAgg(scopeRows, batch);
-  const rr=scopeRows.filter(r=>(r['营期数']||'')===batch);
-  const days=bcDayCols(rr);
+function bcTextMulti(batches, scopeRows, hhmm){
+  const bs=bcSortBatches(batches);
+  if(!bs.length) return '';
+  const scope=scopeRows||[];
+  const cats=distinct(scope.filter(r=>bs.indexOf(r['营期数'])>=0), r=>r._cat).filter(Boolean);
+  const cat=(cats.length===1)? catName(cats[0]) : '全部品类';
+  const lines=[(state.project||'-')+'-'+(state.link||'-')+'-'+cat+'转化播报，数据推送时间：'+(hhmm||bcNowHHmm())];
+  bs.forEach(b=>{
+    const rr=scope.filter(r=>(r['营期数']||'')===b);
+    lines.push(b+'-'+bcCityOf(rr)+'，低价单产'+fmt(bcM(rr).val,1));
+  });
+  return lines.join('\n');
+}
+/* 营期升序（按期号数字排序） */
+function bcSortBatches(list){
+  return (list||[]).filter(Boolean).slice().sort((a,b)=>
+    (parseInt(String(a).replace(/\D/g,''))||0)-(parseInt(String(b).replace(/\D/g,''))||0));
+}
+/* 默认播报范围：转化中营期里「阶段 Day 最小」的**全部**营期（同 Day 同时转化→都推），营期升序
+   ★ 若已无转化中营期（都结束了）→ 取最新一期。 */
+function bcActiveBatches(rows){
+  const by={}; (rows||[]).forEach(r=>{ const b=r['营期数']||''; if(!b) return; (by[b]=by[b]||[]).push(r); });
+  const all=Object.keys(by);
+  if(!all.length) return [];
+  const act=all.filter(b=>!isStageEnded(by[b][0]));
+  const pool=act.length? act : [bcSortBatches(all).pop()];
+  let minD=null;
+  pool.forEach(b=>{ const d=stageDay(by[b][0]); if(d==null) return; if(minD==null||d<minD) minD=d; });
+  const hit=pool.filter(b=>{ const d=stageDay(by[b][0]); return (minD==null)? true : d===minD; });
+  return bcSortBatches(hit.length? hit : pool);
+}
+/* 该营期的负责人（按负责人大盘产值降序） */
+function bcOwnersOf(rr){
+  const col=dimColOf(OWNER);
+  return distinct(rr, r=>r[col]).filter(Boolean)
+    .map(o=>({ o:o, val:bcM(rr.filter(r=>(r[col]||'')===o)).val }))
+    .sort((a,b)=>b.val-a.val).map(x=>x.o);
+}
+/* 营期元信息（营期升序）——设置窗与预览用 */
+function bcBatchMeta(base){
+  const by={}; (base||[]).forEach(r=>{ const b=r['营期数']||''; if(b) (by[b]=by[b]||[]).push(r); });
+  return bcSortBatches(Object.keys(by)).map(b=>{
+    const rr=by[b];
+    return { b:b, day:stageDay(rr[0]), stage:String(rr[0]['阶段']||'').trim(), ended:isStageEnded(rr[0]),
+             owners:bcOwnersOf(rr), rows:rr.length };
+  });
+}
+/* 推送模型：营期（升序）→ 负责人分组（可拆/可合并）→ 行（层级自下而上） */
+function bcPushModel(base, batches, depth, ownerMode){
+  return bcSortBatches(batches).map(b=>{
+    const rr=(base||[]).filter(r=>(r['营期数']||'')===b);
+    if(!rr.length) return null;
+    const col=dimColOf(OWNER);
+    const owners=bcOwnersOf(rr);
+    let groups;
+    if(ownerMode==='split' && owners.length){
+      groups=owners.map(o=>({ owner:o, rows:bcRowsOf(rr.filter(r=>(r[col]||'')===o), b, '全部层级') }));
+    } else {
+      groups=[{ owner:'', rows:bcRowsOf(rr, b, '全部层级') }];
+    }
+    if(depth==='bench') groups=groups.map(g=>({ owner:g.owner, rows:g.rows.filter(x=>x.dim===OWNER) }));
+    return { batch:b, stage:String((rr[0]||{})['阶段']||'').trim(), days:bcDayCols(rr),
+             groups:groups, ownerAgg:bcOwnerAgg(base, b), rows:rr, nOwn:owners.length };
+  }).filter(Boolean);
+}
+/* 一行 → 单元格文本（nDayG = 全图统一的 DAY 组数，不足补空） */
+function bcRowVals(gr, sec, nDayG){
+  const m=bcM(gr.rows); const am=aggMetrics(gr.rows); const dv=bcVs(gr, sec.ownerAgg);
+  const v=[ (gr.rank!=null? String(gr.rank) : '—'),
+    (dv==null? '基准' : (Math.abs(dv)<0.05? '持平' : ((dv>=0?'▲ +':'▼ ')+fmt(dv,1)+'%'))),
+    gr.dim, sec.batch, (gr.info[OWNER]||''), (gr.info['经理']||''), (gr.info['主管']||''), (gr.info['组长']||''), (gr.info['教练']||''),
+    gr.classid||'—', gr.stage||'—',
+    fmt(m.p,0), fmt(m.orders,0), fmt(m.live,0), fmt(m.chat,0),
+    fmtPct(m.rate,1), fmtPct(m.liveRate,1), fmtPct(m.chatRate,1), fmtPct(m.chatShare,1), fmt(m.val,1) ];
+  for(let k=0;k<nDayG;k++){
+    const d=sec.days[k];
+    if(d==null){ v.push(''); v.push(''); }
+    else { v.push(fmt(am['D'+d+'产值'],1)); v.push(fmtPct(am['D'+d+'转率'],1)); }
+  }
+  return v;
+}
+/* 播报图 → PNG：图内按营期（升序）分节，节内再按负责人分节；列宽按内容自适应、全部居中 */
+function bcPushImageDataUrl(model, cat, titleLine){
   const FONT=BC_FONT;
-  const S=2, padX=34, titleH=146, grpH=34, colH=44, rowH=34, footH=104;
+  const S=2, padX=34, titleH=150, grpH=34, colH=44, rowH=34, secH=36, ownH=30, footH=104;
+  const nDayG=Math.max.apply(null, model.map(s=>s.days.length).concat([1]));
   const cols=[{t:'排名',g:'排名指标',min:58},{t:'vs 大盘产值',g:'排名指标',min:104}];
   BC_HEAD_BASE.forEach(t=>cols.push({t:t,g:'基础信息',min:70}));
   BC_HEAD_MAIN.forEach(t=>cols.push({t:t,g:'总转化数据',min:88}));
-  days.forEach(d=>{ cols.push({t:'当天单产',g:'转化DAY '+d,min:82}); cols.push({t:'当天尾款转化率',g:'转化DAY '+d,min:106}); });
-  const vset=gr=>{
-    const m=bcM(gr.rows); const am=aggMetrics(gr.rows); const dv=bcVs(gr, ownerAgg);
-    const v=[ (gr.rank!=null? String(gr.rank) : '—'),
-      (dv==null? '基准' : (Math.abs(dv)<0.05? '持平' : ((dv>=0?'▲ +':'▼ ')+fmt(dv,1)+'%'))),
-      gr.dim, batch, (gr.info[OWNER]||''), (gr.info['经理']||''), (gr.info['主管']||''), (gr.info['组长']||''), (gr.info['教练']||''),
-      gr.classid||'—', gr.stage||'—',
-      fmt(m.p,0), fmt(m.orders,0), fmt(m.live,0), fmt(m.chat,0),
-      fmtPct(m.rate,1), fmtPct(m.liveRate,1), fmtPct(m.chatRate,1), fmtPct(m.chatShare,1), fmt(m.val,1) ];
-    days.forEach(d=>{ v.push(fmt(am['D'+d+'产值'],1)); v.push(fmtPct(am['D'+d+'转率'],1)); });
-    return v;
-  };
-  const cells=rows.map(vset);
+  for(let k=0;k<nDayG;k++){ cols.push({t:'当天单产',min:82}); cols.push({t:'当天尾款转化率',min:106}); }
+  // 全图文本并集 → 统一列宽（保证各节对齐）
+  const allCells=[];
+  model.forEach(sec=>sec.groups.forEach(gp=>gp.rows.forEach(r=>allCells.push(bcRowVals(r, sec, nDayG)))));
   const cv=document.createElement('canvas');
-  fitCols(cv.getContext('2d'), cols, cells, {pad:28, headerFont:'bold 13px '+FONT, cellFont:'13px '+FONT});
+  fitCols(cv.getContext('2d'), cols, allCells, {pad:28, headerFont:'bold 13px '+FONT, cellFont:'13px '+FONT});
   const cellW=cols.reduce((a,c)=>a+c.w,0);
   const W=cellW+padX*2;
-  const H=titleH+grpH+colH+Math.max(rows.length,1)*rowH+footH;
+  let bodyH=0;
+  model.forEach(sec=>{
+    bodyH+=secH+grpH+colH;
+    sec.groups.forEach(gp=>{ bodyH+=(gp.owner? ownH:0)+gp.rows.length*rowH; });
+  });
+  const H=titleH+Math.max(bodyH,rowH)+footH;
   cv.width=Math.round(W*S); cv.height=Math.round(H*S);
   const g=cv.getContext('2d'); g.scale(S,S);
   g.fillStyle='#ffffff'; g.fillRect(0,0,W,H);
-  const lines=bcText(batch, scopeRows).split('\n');
+  // 标题条
   g.fillStyle='#1b45c8'; g.fillRect(0,0,W,titleH);
   g.textAlign='left'; g.fillStyle='#ffffff'; g.font='bold 25px '+FONT;
   g.fillText('元析智察 · 转化数据播报', padX, 46);
   g.font='13.5px '+FONT; g.globalAlpha=0.95;
-  g.fillText(lines[0]||'', padX, 74);
-  g.fillText(lines[1]||'', padX, 96);
+  g.fillText(titleLine||'', padX, 74);
+  g.fillText('共 '+model.length+' 个营期：'+model.map(s=>s.batch).join('、')+'　·　图内按营期升序分节，节内按负责人分节', padX, 96);
   g.font='12.5px '+FONT;
-  g.fillText('共 '+rows.length+' 行　·　阶段 '+((rows[0]&&rows[0].stage)||'—')+'　·　列宽按内容自适应（可横向缩放查看）', padX, 122);
+  g.fillText('列宽按内容自适应（可横向缩放查看）　·　生成时间：'+new Date().toLocaleString('zh-CN'), padX, 122);
   g.globalAlpha=1;
   let y=titleH;
-  g.fillStyle='#eef3fb'; g.fillRect(0,y,W,grpH);
-  let cx=padX, i=0;
-  while(i<cols.length){
-    const gname=cols[i].g||''; let w=0;
-    while(i<cols.length && (cols[i].g||'')===gname){ w+=cols[i].w; i++; }
-    g.textAlign='center'; g.fillStyle='#33415c'; g.font='bold 13.5px '+FONT;
-    if(gname) g.fillText(gname, cx+w/2, y+grpH/2+5);
-    cx+=w;
-  }
-  y+=grpH;
-  g.fillStyle='#f7f9fd'; g.fillRect(0,y,W,colH);
-  cx=padX; g.textAlign='center'; g.fillStyle='#33415c'; g.font='bold 12.5px '+FONT;
-  cols.forEach(c=>{ g.fillText(c.t, cx+c.w/2, y+colH/2+5); cx+=c.w; });
-  y+=colH;
-  rows.forEach((gr,gi)=>{
-    const vals=cells[gi]; const dv=bcVs(gr, ownerAgg);
-    const isOwnerRow=(gr.dim===OWNER);
-    g.fillStyle = isOwnerRow? '#eaf2ff' : (gi%2? '#fafbfd':'#ffffff');
-    g.fillRect(0,y,W,rowH);
-    cx=padX;
-    cols.forEach((c,ci)=>{
-      g.textAlign='center';
-      if(ci===1){
-        const flat=(dv==null)||(Math.abs(dv)<0.05);
-        g.fillStyle = flat? '#aab6c8' : (dv>=0? '#ef4444':'#10b981');
-        g.font=(flat?'':'bold ')+'13px '+FONT;
+  model.forEach(sec=>{
+    // 营期分节带
+    g.fillStyle='#dbeafe'; g.fillRect(0,y,W,secH);
+    g.textAlign='left'; g.fillStyle='#1b45c8'; g.font='bold 13.5px '+FONT;
+    g.fillText(sec.batch+'　·　阶段 '+(sec.stage||'—')+'　·　负责人 '+(sec.nOwn||1)+' 位　·　共 '+
+      sec.groups.reduce((a,gp)=>a+gp.rows.length,0)+' 行', padX, y+secH/2+5);
+    g.strokeStyle='#bfdbfe'; g.beginPath(); g.moveTo(0,y+secH); g.lineTo(W,y+secH); g.stroke();
+    y+=secH;
+    // 两级表头（列宽全图统一；本节的 DAY 组名取自本节阶段）
+    const nBase=2+BC_HEAD_BASE.length+BC_HEAD_MAIN.length;
+    let cx=padX, i=0;
+    g.fillStyle='#eef3fb'; g.fillRect(0,y,W,grpH);
+    while(i<cols.length){
+      const gname=cols[i].g||'';
+      if(gname){
+        let w=0;
+        while(i<cols.length && (cols[i].g||'')===gname){ w+=cols[i].w; i++; }
+        g.textAlign='center'; g.fillStyle='#33415c'; g.font='bold 13.5px '+FONT;
+        g.fillText(gname, cx+w/2, y+grpH/2+5);
+        cx+=w;
+      } else {
+        // DAY 列：固定 2 列一组（当天单产 + 当天尾款转化率）
+        const k=Math.floor((i-nBase)/2);
+        const w=cols[i].w+(cols[i+1]?cols[i+1].w:0);
+        const label=(sec.days[k]!=null? ('转化DAY '+sec.days[k]) : '');
+        if(label){ g.textAlign='center'; g.fillStyle='#33415c'; g.font='bold 13.5px '+FONT; g.fillText(label, cx+w/2, y+grpH/2+5); }
+        cx+=w; i+=2;
       }
-      else if(ci===19){ g.fillStyle='#2f6fed'; g.font='bold 13.5px '+FONT; }
-      else { g.fillStyle = isOwnerRow? '#0f172a' : '#33415c'; g.font=(isOwnerRow?'bold ':'')+'13px '+FONT; }
-      g.fillText(String(vals[ci]), cx+c.w/2, y+rowH/2+5);
-      cx+=c.w;
+    }
+    y+=grpH;
+    g.fillStyle='#f7f9fd'; g.fillRect(0,y,W,colH);
+    cx=padX; g.textAlign='center'; g.fillStyle='#33415c'; g.font='bold 12.5px '+FONT;
+    cols.forEach(c=>{ g.fillText(c.t, cx+c.w/2, y+colH/2+5); cx+=c.w; });
+    y+=colH;
+    // 负责人分节 + 行
+    sec.groups.forEach(gp=>{
+      if(gp.owner){
+        g.fillStyle='#eef7f2'; g.fillRect(0,y,W,ownH);
+        g.textAlign='left'; g.fillStyle='#0f766e'; g.font='bold 13px '+FONT;
+        g.fillText('负责人 '+gp.owner+'　·　'+gp.rows.length+' 行', padX, y+ownH/2+5);
+        y+=ownH;
+      }
+      gp.rows.forEach((gr,ri)=>{
+        const vals=bcRowVals(gr, sec, nDayG); const dv=bcVs(gr, sec.ownerAgg);
+        const isOwnerRow=(gr.dim===OWNER);
+        const isOwnerFirst=(!!gp.owner && isOwnerRow);
+        g.fillStyle = (isOwnerRow||isOwnerFirst)? '#eaf2ff' : (ri%2? '#fafbfd':'#ffffff');
+        g.fillRect(0,y,W,rowH);
+        cx=padX;
+        cols.forEach((c,ci)=>{
+          g.textAlign='center';
+          if(ci===1){
+            const flat=(dv==null)||(Math.abs(dv)<0.05);
+            g.fillStyle = flat? '#aab6c8' : (dv>=0? '#ef4444':'#10b981');
+            g.font=(flat?'':'bold ')+'13px '+FONT;
+          } else if(ci===19){ g.fillStyle='#2f6fed'; g.font='bold 13.5px '+FONT; }
+          else { g.fillStyle = isOwnerRow? '#0f172a' : '#33415c'; g.font=(isOwnerRow?'bold ':'')+'13px '+FONT; }
+          g.fillText(String(vals[ci]), cx+c.w/2, y+rowH/2+5);
+          cx+=c.w;
+        });
+        g.strokeStyle='#e8eef7'; g.lineWidth=1; g.beginPath(); g.moveTo(0,y+rowH); g.lineTo(W,y+rowH); g.stroke();
+        y+=rowH;
+      });
     });
-    g.strokeStyle='#e8eef7'; g.lineWidth=1; g.beginPath(); g.moveTo(0,y+rowH); g.lineTo(W,y+rowH); g.stroke();
-    y+=rowH;
   });
   g.textAlign='left'; g.fillStyle='#8b9bb4'; g.font='12.5px '+FONT;
   g.fillText('vs 大盘产值＝该行总产值相对「所属负责人合计产值」的偏差（▲红 高于 · ▼绿 低于）；负责人行即本团队基准', padX, y+28);
@@ -6404,6 +6487,133 @@ function bcImageDataUrl(batch, scopeRows){
   g.fillText('生成时间：'+new Date().toLocaleString('zh-CN'), padX, y+76);
   g.textAlign='right'; g.fillText('元析智察 · 教育转化监测工作台', W-padX, y+76);
   return cv.toDataURL('image/png');
+}
+/* 播报推送设置（LS bcPushCfg） */
+function bcPushCfgGet(){
+  const d={ range:'auto', batches:[], split:'one', owner:'split', depth:'full', chatid:'' };
+  let c={}; try{ c=JSON.parse(LS.get('bcPushCfg')||'{}')||{}; }catch(e){ c={}; }
+  ['range','split','owner','depth','chatid'].forEach(k=>{ if(c[k]) d[k]=c[k]; });
+  if(Array.isArray(c.batches)) d.batches=c.batches.slice();
+  return d;
+}
+function bcPushCfgSet(c){ LS.set('bcPushCfg',c); }
+/* 点击「推送播报」→ 打开设置窗 */
+function bcPushModal(base){
+  const meta=bcBatchMeta(base);
+  if(!meta.length){ const m=$('#bcMsg'); if(m) m.innerHTML='<span style="color:#fca5a5">⚠ 当前筛选范围没有可播报的数据</span>'; return; }
+  const auto=bcActiveBatches(base);
+  const cfg=bcPushCfgGet();
+  cfg.batches=(cfg.range==='manual')? cfg.batches.filter(b=>meta.some(m=>m.b===b)) : auto;
+  if(!cfg.batches.length) cfg.batches=auto;
+  const html='<div style="font-size:12px;color:var(--dim);line-height:1.8;margin-bottom:10px">数据范围：<b>'+esc(state.project||'-')+' / '+esc(state.link||'-')+'</b>'
+      +'　·　可选营期 <b>'+meta.length+'</b> 个　·　其中转化中 '+(meta.filter(m=>!m.ended).length)+' 个</div>'
+    +'<div class="field"><label>播报范围</label><div class="seg" id="bpRange">'
+      +'<button class="btn sm'+(cfg.range==='manual'?'':' on')+'" data-v="auto">自动 · 转化中最小 Day</button>'
+      +'<button class="btn sm'+(cfg.range==='manual'?' on':'')+'" data-v="manual">手动选择营期</button></div></div>'
+    +'<div class="field" id="bpPick" style="'+(cfg.range==='manual'?'':'display:none;')+'"><label>选择营期（可多选 · 推送时按营期升序）</label>'
+      +'<div id="bpBatchBox" style="display:flex;flex-wrap:wrap;gap:2px 14px;font-size:12px;line-height:2">'
+      +meta.map(m=>'<label style="display:inline-flex;align-items:center;gap:5px"><input type="checkbox" class="bp-b" value="'+esc(m.b)+'"'+(cfg.batches.indexOf(m.b)>=0?' checked':'')+'>'
+        +esc(m.b)+(m.day!=null?('（Day '+m.day+'）'):'')+(m.ended?' <span style="color:var(--dim)">已结束</span>':' <span style="color:#6ee7b7">转化中</span>')+'</label>').join('')
+      +'</div></div>'
+    +'<div class="field"><label>拆分方式</label><div class="seg" id="bpSplit">'
+      +'<button class="btn sm'+(cfg.split==='batch'?'':' on')+'" data-v="one">多个营期合并在同一张图</button>'
+      +'<button class="btn sm'+(cfg.split==='batch'?' on':'')+'" data-v="batch">按营期拆图（每期一张）</button></div></div>'
+    +'<div class="field"><label>负责人</label><div class="seg" id="bpOwner">'
+      +'<button class="btn sm'+(cfg.owner==='merge'?'':' on')+'" data-v="split">图内按负责人分节</button>'
+      +'<button class="btn sm'+(cfg.owner==='merge'?' on':'')+'" data-v="merge">不用分节</button></div></div>'
+    +'<div class="field"><label>层级范围</label><div class="seg" id="bpDepth">'
+      +'<button class="btn sm'+(cfg.depth==='bench'?'':' on')+'" data-v="full">含层级明细</button>'
+      +'<button class="btn sm'+(cfg.depth==='bench'?' on':'')+'" data-v="bench">仅负责人大盘</button></div></div>'
+    +'<div class="field"><label>目标群</label><select id="bpChat"></select></div>'
+    +'<div id="bpPrev" style="font-size:12px;color:var(--dim);line-height:1.9;margin-top:10px;border-top:1px solid var(--line);padding-top:8px"></div>';
+  showModal('推送设置 · 转化数据播报', html, [
+    { t:'取消', cls:'', fn:closeModal },
+    { t:'开始推送', cls:'pri', fn:()=>{
+        const ch=$('#bpChat'); if(ch&&ch.value){ cfg.chatid=ch.value; LS.set('pushChat',ch.value); syncPushChatSel(ch.value); }
+        closeModal(); bcPushCfgSet(cfg); bcPushRun(cfg, base);
+      } }
+  ]);
+  const bindSeg=(id,key)=>{ const el=$('#'+id); if(!el) return;
+    el.querySelectorAll('button').forEach(b=>{ b.onclick=()=>{ cfg[key]=b.dataset.v; el.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); refresh(); }; }); };
+  bindSeg('bpRange','range'); bindSeg('bpSplit','split'); bindSeg('bpOwner','owner'); bindSeg('bpDepth','depth');
+  const chat=$('#bpChat');
+  if(chat){
+    const src=$('.al-push-chat[data-panel="bc"]');
+    chat.innerHTML=(src&&src.options.length)? src.innerHTML : '<option value="">（检测中…）</option>';
+    chat.value=(src&&src.value)||LS.get('pushChat')||'';
+    chat.onchange=()=>{ LS.set('pushChat',chat.value); syncPushChatSel(chat.value); cfg.chatid=chat.value; };
+    alPushLoadChats(false).then(()=>{ const s2=$('.al-push-chat[data-panel="bc"]'); if(s2&&s2.options.length){ chat.innerHTML=s2.innerHTML; chat.value=s2.value; } });
+  }
+  $$('.bp-b').forEach(cb=>{ cb.onchange=()=>refresh(); });
+  function refresh(){
+    const pick=$('#bpPick'); if(pick) pick.style.display=(cfg.range==='manual')?'block':'none';
+    if(cfg.range==='manual') cfg.batches=$$('.bp-b').filter(x=>x.checked).map(x=>x.value);
+    else cfg.batches=auto;
+    const bs=bcSortBatches(cfg.batches);
+    const pv=$('#bpPrev'); if(!pv) return;
+    if(!bs.length){ pv.innerHTML='<b style="color:#fca5a5">未选择营期</b>'; return; }
+    const model=bcPushModel(base, bs, cfg.depth==='bench'?'bench':'full', cfg.owner==='merge'?'merge':'split');
+    const nImg=(cfg.split==='batch')? model.length : 1;
+    const rsOwn=base.filter(r=>bs.indexOf(r['营期数'])>=0);
+    const nOwn=distinct(rsOwn, r=>r[dimColOf(OWNER)]).filter(Boolean).length;   // 负责人个数（与"是否分节"无关）
+    const splitName=(cfg.split==='batch')? '按营期拆图（每期 1 张）' : '合并在同一张图';
+    const txt=bcTextMulti(bs, base).split('\n');
+    pv.innerHTML='将推送 <b>'+nImg+'</b> 张图　·　拆分：<b>'+splitName+'</b>'
+      +'<br>营期（升序）：<b>'+esc(bs.join('、'))+'</b>　·　负责人 <b>'+(nOwn||'（未标注）')+'</b>'
+      +'<br>图内分节：<b>'+model.length+'</b> 个营期'+(cfg.owner==='merge'?'（负责人不分节）':' × 按负责人分节')
+      +'　·　层级：'+(cfg.depth==='bench'?'仅负责人大盘':'含明细')
+      +'<br>文字总结（逐期）：<br><span style="color:var(--fg)">'+esc(txt[0])+'</span>'
+      +txt.slice(1).map(x=>'<br><span style="color:var(--fg)">'+esc(x)+'</span>').join('');
+  }
+  refresh();
+}
+/* 执行推送：逐张图片 → 文字总结（多营期逐期一行） */
+async function bcPushRun(cfg, base){
+  const msg=$('#bcMsg'); const say=(h,lv)=>{ if(msg){ msg.innerHTML='<span style="color:'+(lv==='err'?'#fca5a5':(lv==='success'?'#6ee7b7':'var(--dim)'))+'">'+h+'</span>'; } };
+  let chatid=cfg.chatid||LS.get('pushChat')||'';
+  if(!chatid){
+    const sel=document.querySelector('.al-push-chat[data-panel="bc"]') || $('#alPushChat');
+    await alPushLoadChats(true);
+    chatid=(sel&&sel.value)||LS.get('pushChat')||'';
+  }
+  if(!chatid){ say('⚠ 未连接到推送服务。'+pushDiagHint(),'err'); return; }
+  const bs=bcSortBatches(cfg.batches||[]);
+  if(!bs.length){ say('⚠ 未选择营期（或该范围无可播报营期）','err'); return; }
+  const depth=(cfg.depth==='bench')?'bench':'full';
+  const ownerMode=(cfg.owner==='merge')?'merge':'split';
+  const model=bcPushModel(base, bs, depth, ownerMode);
+  if(!model.length){ say('⚠ 所选营期在本范围内没有数据','err'); return; }
+  const titleLine=bcTextMulti(bs, base).split('\n')[0];
+  const jobs=(cfg.split==='batch')? model.map(sec=>bcPushModel(base,[sec.batch],depth,ownerMode)) : [model];
+  const pb=pushBase(); let ok=0; const sized=[];
+  for(let i=0;i<jobs.length;i++){
+    const m=jobs[i];
+    const label=(cfg.split==='batch')? ('营期 '+m[0].batch) : (m.length+' 个营期');
+    say('正在生成并推送「'+esc(label)+'」播报图（'+(i+1)+'/'+jobs.length+'）…','info');
+    let dataUrl;
+    try{ dataUrl=bcPushImageDataUrl(m, state.cat||'', titleLine); }
+    catch(e){ say('❌ 生成播报图失败：'+esc(e.message||e),'err'); return; }
+    try{
+      const r=await fetch(pb+'/push-image',{ method:'POST', mode:'cors', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ chatid:chatid, dataUrl:dataUrl, filename:'broadcast_'+(i+1)+'.png' }) });
+      const res=await r.json();
+      if(!res.ok){ say('❌ 播报图推送失败：'+esc(res.error||'未知错误')+(res.code?('（errcode '+res.code+'）'):''),'err'); return; }
+      ok++; sized.push(Math.round(dataUrl.length*0.75/1024));
+    }catch(e){ say('❌ 无法连接推送服务：'+esc(e.message)+pushDiagHint(),'err'); return; }
+    if(i<jobs.length-1) await new Promise(r2=>setTimeout(r2,1200));
+  }
+  const txt=bcTextMulti(bs, base);
+  say('播报图已推送（'+sized.join('、')+'KB），正在发送文字总结…','info');
+  try{
+    const r=await fetch(pb+'/push',{ method:'POST', mode:'cors', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ chatid:chatid, content:txt }) });
+    const res=await r.json();
+    if(res.ok){
+      const nm=(res.push&&res.push.chat_name)||chatid;
+      say('✅ 已推送 '+ok+' 张播报图 + 文字总结到「'+esc(nm)+'」<br><span style="color:var(--dim)">'+esc(txt).replace(/\n/g,'<br>')+'</span>','success');
+      auditLog('企微推送','转化数据播报 '+bs.join('、')+' → '+nm);
+    } else say('⚠ 播报图已送达，文字推送失败：'+esc(res.error||'未知错误'),'err');
+  }catch(e){ say('⚠ 播报图已送达，文字推送失败：'+esc(e.message),'err'); }
 }
 
 /* ============================================================
