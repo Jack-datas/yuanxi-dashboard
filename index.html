@@ -3184,10 +3184,10 @@ function renderPRhythm(){
   // —— 对比基准选择器 ——
   const baseSel=$('#rhythmBase');
   if(baseSel){
-    // 非「恰 1 个月」时，上月大盘/本月大盘无具体月份可参照，仅保留「上个营期」对比
-    [...baseSel.options].forEach(o=>{ const hide=!isSingleMonth()&&(o.value==='lastMonth'||o.value==='curMonth'); o.disabled=hide; o.style.display=hide?'none':''; });
+    // ★2026-09-16：本月/上月大盘 不再因「非单月范围」被隐藏或禁用（用户要求保留这两项）。
+    //   多月份范围下，"本月"改由「当前营期所在月份」锚定（见下方 curMonth 推导），语义与单选月份时一致。
+    [...baseSel.options].forEach(o=>{ o.disabled=false; o.style.display=''; });
     if(!['lastBatch','lastMonth','curMonth','custom'].includes(rhythmBase)) rhythmBase='lastBatch';
-    if(!isSingleMonth() && (rhythmBase==='lastMonth'||rhythmBase==='curMonth')) rhythmBase='lastBatch';
     baseSel.value=rhythmBase;
     baseSel.onchange=()=>{ rhythmBase=baseSel.value; renderPRhythm(); };
     // ★自定义基准营期（单选）：选「自定义营期」时显示，默认取上一期
@@ -3206,40 +3206,54 @@ function renderPRhythm(){
   const rr=by[rhythmBatch]||[]; if(!rr.length){ clearEmpty(); return; }
   const DL=dayLabels(); const pCur=sum(rr,r=>r['原始人数']);
   const isRate=rhythmMode==='rate';
-  // —— 基准行：上个营期 / 上月大盘 / 本月大盘 ——
+  // —— 基准行：上个营期 / 上月大盘 / 本月大盘 / 自定义营期 ——
   const all=state.cat? projLinkFilter(catRows(state.cat)) : projLinkFilter(allData());
-  const curMonth=parseInt(state.month)||0;
+  // ★2026-09-16：curMonth 兼容两种范围 ——
+  //   ① 顶部恰好选中 1 个月：直接用该月；
+  //   ② 选了「全部月份」/多个月份：用**当前营期所在月份**（营期与月份天然绑定；跨月营期取出现最多的月份）。
+  //   这样「本月大盘 / 上月大盘」在任何筛选下都有明确锚点，不再需要隐藏。
+  const curMonth=(function(){
+    const m0=parseInt(state.month)||0; if(m0) return m0;
+    const cnt={};
+    rr.forEach(r=>{ const n=parseInt(String(r['月份']||'').replace(/\D/g,''),10)||0; if(n>0) cnt[n]=(cnt[n]||0)+1; });
+    const ks=Object.keys(cnt); if(!ks.length) return 0;
+    ks.sort((a,b)=> (cnt[b]-cnt[a]) || ((+a)-(+b)));
+    return +ks[0];
+  })();
   const curBNum=parseInt((rhythmBatch+'').replace(/\D/g,''))||0;
   let histRows=[], baseLabel='';
   if(rhythmBase==='lastBatch' && curBNum>0){
     const pb='第'+(curBNum-1)+'期';
     histRows=all.filter(r=>(r['营期数']||'')===pb);
     if(histRows.length) baseLabel='上个营期（'+pb+' · '+histRows.length+' 条班级）';
-    else { baseLabel='上个营期（'+pb+'）无数据，已回退：'; }
+    // 2026-09-16：无数据时不写 baseLabel（保持空）→ 交由末尾兜底块真正回退为历史营期均值。
+    //   原实现把「已回退：」写进 baseLabel，导致 if(!baseLabel) 兜底永不执行 → 文案说已回退、实际基准为空。
   }
   if(!baseLabel && rhythmBase==='curMonth' && curMonth>0){
     const cm=curMonth+'月';
     histRows=all.filter(r=>(r['月份']||'')===cm && (r['营期数']||'')!==rhythmBatch);
     if(histRows.length) baseLabel='本月大盘（'+cm+' · 其他营期 '+distinct(histRows,r=>r['营期数']).length+' 期 · '+histRows.length+' 条班级）';
-    else { baseLabel='本月其他营期无数据，已回退：'; }
+    // 无数据 → 留空，走末尾兜底回退（同上）
   }
   if(!baseLabel && rhythmBase==='lastMonth' && curMonth>1){
     const pm=(curMonth-1)+'月';
     histRows=all.filter(r=>(r['月份']||'')===pm);
     if(histRows.length) baseLabel='上月大盘（'+pm+' · '+distinct(histRows,r=>r['营期数']).length+' 期 · '+histRows.length+' 条班级）';
-    else { baseLabel='上月（'+pm+'）无数据，已回退：'; }
+    // 无数据 → 留空，走末尾兜底回退（同上）
   }
   if(!baseLabel && rhythmBase==='custom'){
     const bb=rhythmBaseBatch;
     histRows=bb? all.filter(r=>(r['营期数']||'')===bb) : [];
     if(histRows.length) baseLabel='自定义营期（'+bb+' · '+histRows.length+' 条班级）';
-    else baseLabel='自定义营期（'+(bb||'未选')+'）无数据，已回退：';
+    // 无数据 → 留空，走末尾兜底回退（同上）
   }
   if(!baseLabel){
     const curOpen=(rr[0]['开营时间']||'').toString();
     histRows=all.filter(r=>(r['营期数']||'')!==rhythmBatch && (!curOpen || ((r['开营时间']||'').toString()<curOpen)));
     if(!histRows.length) histRows=all.filter(r=>(r['营期数']||'')!==rhythmBatch);
-    baseLabel='历史营期均值（'+distinct(histRows,r=>r['营期数']).length+' 期 · '+histRows.length+' 条班级）';
+    // 兜底（真正的回退）：所选基准无数据时，回落为早于当前营期的历史营期均值；再无则取其它全部营期。
+    baseLabel='历史营期均值（'+distinct(histRows,r=>r['营期数']).length+' 期 · '+histRows.length+' 条班级）'
+      +(rhythmBase==='lastBatch'? '' : '（所选基准无数据，已回退）');
   }
   const pPrev=sum(histRows,r=>r['原始人数']);
   if(baseNote) baseNote.textContent='对比基准：'+baseLabel+' · 维度：'+(isRate?'转率':'产值')+' · 蓝=当前营期 琥珀=基准';
