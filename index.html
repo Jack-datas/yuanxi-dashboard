@@ -827,7 +827,7 @@ MOD_TEMPLATES['month']="<div class=\"mod\" id=\"mod-month\">\n        <div class
 MOD_TEMPLATES['period']="<div class=\"mod\" id=\"mod-period\">\n        <div class=\"page-head\"><h2>营期数据</h2><span class=\"desc\">营期汇总看板 · 层级对比 · 智能分析</span></div>\n        <div class=\"tabbar\" data-tabs>\n          <div class=\"tab active\" data-sub=\"pCross\">营期汇总看板</div>\n          <div class=\"tab\" data-sub=\"pRhythm\">营期分日节奏</div>\n          <div class=\"tab\" data-sub=\"pCoachBoard\">人员业绩看板</div>\n        </div>\n        <div class=\"subpanel show\" data-sub=\"pCross\">\n          <div class=\"card\" style=\"margin-bottom:14px\"><div class=\"card-t\"><h3>当月营期大盘</h3><span class=\"sub\" id=\"batchKpiSub\"></span></div><div id=\"batchKpi\"></div></div>\n          <div class=\"vizboard\" style=\"margin-top:14px\">\n            <div class=\"card-t\"><h3>可视化分析看板</h3><span class=\"sub\" id=\"vizSub\"></span></div>\n            <div class=\"dimbar\" style=\"margin:10px 0\">\n              <div class=\"seg\" id=\"vizAggSeg\">\n                <button class=\"btn sm on\" data-agg=\"营期\">营期</button>\n                <button class=\"btn sm\" data-agg=\"组长\">组长</button>\n                <button class=\"btn sm\" data-agg=\"主管\">主管</button>\n                <button class=\"btn sm\" data-agg=\"经理\">经理</button>\n                <button class=\"btn sm\" data-agg=\"负责人\">负责人</button>\n              </div>\n              <span class=\"dim-note\" style=\"font-size:12px;color:var(--dim);line-height:30px;margin-left:10px\">按聚合维度切换下方 8 图 · 数据范围=顶部 项目/链路/品类/月份 全局筛选</span>\n            </div>\n            <div class=\"grid g2\" id=\"vizGrid\">\n              <div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">1</span><h3>原始人数占比</h3><span class=\"vtype\">环形图</span></div><div class=\"chartbox\" id=\"pViz1\" style=\"aspect-ratio:680/300\"></div><div id=\"pVizAi1\"></div></div>\n              <div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">2</span><h3>流水分布</h3><span class=\"vtype\">柱状图</span></div><div class=\"chartbox\" id=\"pViz2\" style=\"aspect-ratio:680/300\"></div><div id=\"pVizAi2\"></div></div>\n              <div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">3</span><h3>总产值 &amp; 总尾款转率</h3><span class=\"vtype\">组合图</span></div><div class=\"chartbox\" id=\"pViz3\" style=\"aspect-ratio:680/300\"></div><div id=\"pVizAi3\"></div></div>\n              <div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">4</span><h3>首日产值 &amp; 首日转率</h3><span class=\"vtype\">组合图</span></div><div class=\"chartbox\" id=\"pViz4\" style=\"aspect-ratio:680/300\"></div><div id=\"pVizAi4\"></div></div>\n              <div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">5</span><h3>直播 / 私聊 占比</h3><span class=\"vtype\">堆叠柱</span></div><div class=\"chartbox\" id=\"pViz5\" style=\"aspect-ratio:680/300\"></div><div id=\"pVizAi5\"></div></div>\n              <div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">6</span><h3>私聊转率 &amp; 直播转率</h3><span class=\"vtype\">折线图</span></div><div class=\"chartbox\" id=\"pViz6\" style=\"aspect-ratio:680/300\"></div><div id=\"pVizAi6\"></div></div>\n              <div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">7</span><h3>W1 &amp; W2 转率趋势</h3><span class=\"vtype\">双线图</span></div><div class=\"chartbox\" id=\"pViz7\" style=\"aspect-ratio:680/300\"></div><div id=\"pVizAi7\"></div></div>\n              <div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">8</span><h3>转率 vs 月度大盘</h3><span class=\"vtype\">差值图</span></div><div class=\"chartbox\" id=\"pViz8\" style=\"aspect-ratio:680/300\"></div><div id=\"pVizAi8\"></div></div>\n              <div class=\"card vcard\" id=\"pViz9Card\" style=\"display:none\"><div class=\"card-t\"><span class=\"vno\">9</span><h3>定金率 &amp; 定金追回率 趋势</h3><span class=\"vtype\">折线图</span></div><div class=\"chartbox\" id=\"pViz9\" style=\"aspect-ratio:680/300\"></div><div id=\"pVizAi9\"></div></div><div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">10</span><h3>产值趋势（首日/首周/总）</h3><span class=\"vtype\">折线图</span></div><div class=\"chartbox\" id=\"pViz10\" style=\"aspect-ratio:680/300\"></div><div id=\"pVizAi10\"></div></div><div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">11</span><h3>转率趋势（首日/首周/总）</h3><span class=\"vtype\">折线图</span></div><div class=\"chartbox\" id=\"pViz11\" style=\"aspect-ratio:680/300\"></div><div id=\"pVizAi11\"></div></div><div class=\"card vcard\" id=\"pViz12Card\"><div class=\"card-t\"><span class=\"vno\">12</span><h3>定金趋势（首日/首周）</h3><span class=\"vtype\">折线图</span></div><div class=\"chartbox\" id=\"pViz12\" style=\"aspect-ratio:680/300\"></div><div id=\"pVizAi12\"></div></div>\n            </div>\n          </div>\n          <div class=\"card\"><div class=\"card-t\"><h3>营期汇总明细</h3><span class=\"sub\" id=\"crossSub\"></span></div>\n            <div class=\"dimbar\">\n              <div class=\"seg\" id=\"crossDimSeg\">\n                <button class=\"btn sm on\" data-dim=\"\">全部</button>\n                <button class=\"btn sm\" data-dim=\"教练\">教练</button>\n                <button class=\"btn sm\" data-dim=\"组长\">组长</button>\n                <button class=\"btn sm\" data-dim=\"主管\">主管</button>\n                <button class=\"btn sm\" data-dim=\"经理\">经理</button>\n                <button class=\"btn sm\" data-dim=\"负责人\" id=\"dimBtnOwner\">负责人</button>\n                <button class=\"btn sm\" data-dim=\"营期大盘\">营期大盘</button>\n              </div>\n              <input type=\"text\" id=\"crossName\" placeholder=\"姓名过滤明细…\" style=\"max-width:150px;height:30px;border:1px solid var(--line);border-radius:7px;background:var(--input,#0d1728);color:var(--fg);padding:0 10px;font-size:12px;margin-left:10px\">\n              <span class=\"spacer\"></span>\n              <button class=\"btn sm pri\" id=\"pCrossAI\">智能分析</button>\n              <button class=\"btn sm\" id=\"pCrossReset\">重置</button>\n              <button class=\"btn sm\" id=\"pCrossExport\">导出</button>\n            </div>\n            <div class=\"tbl-wrap\" id=\"crossTable\" style=\"max-height:480px\"></div>\n        </div>\n\n        <div class=\"subpanel\" data-sub=\"pRhythm\">\n          <div class=\"filterbar\" style=\"margin-bottom:12px\">\n            <div class=\"fld\"><label>营期</label><select id=\"rhythmBatch\"></select></div>\n            <div class=\"fld\"><label>维度</label><div style=\"display:flex;gap:6px\"><button class=\"btn on\" id=\"rhythmRate\">转率</button><button class=\"btn\" id=\"rhythmVal\">产值</button></div></div>\n            <div class=\"fld\"><span class=\"dim-note\" id=\"rhythmBaseNote\" style=\"font-size:12px;color:var(--dim);line-height:34px\"></span></div>\n          </div>\n          <div class=\"kpis mod4\" id=\"rhythmKeys\" style=\"margin-bottom:14px\"></div>\n          <div class=\"grid g2\">\n            <div class=\"card\"><div class=\"card-t\"><h3 id=\"rhythmCumTitle\">14 天累计转化曲线</h3><span class=\"sub\" id=\"rhythmCumSub\">当前营期 vs 同链路历史营期均值</span></div><div class=\"chartbox\" id=\"rhythmCum\" style=\"aspect-ratio:680/340\"></div></div>\n            <div class=\"card\"><div class=\"card-t\"><h3 id=\"rhythmDailyTitle\">每日新增转化对比</h3><span class=\"sub\" id=\"rhythmDailySub\">当前营期 vs 历史营期同日</span></div><div class=\"chartbox\" id=\"rhythmDaily\" style=\"aspect-ratio:680/340\"></div></div>\n          </div>\n          <div class=\"card\"><div class=\"card-t\"><h3>分日转化明细（当前营期 vs 历史营期均值）</h3><span class=\"sub\" id=\"rhythmSub\"></span></div><div class=\"tbl-wrap\" id=\"rhythmTable\" style=\"max-height:420px\"></div></div>\n          <div class=\"card\"><div class=\"card-t\"><h3>AI 节奏诊断与优化建议</h3><span class=\"sub\">自动生成 · 随 营期/维度/筛选 变化</span></div><div id=\"rhythmDiag\"></div></div>\n        </div>\n\n        <div class=\"subpanel\" data-sub=\"pCoachBoard\">\n          <div class=\"filterbar\" style=\"margin-bottom:12px\">\n            <div class=\"fld\"><label>营期</label><select id=\"cbBatch\"></select></div>\n            <div class=\"fld\"><span class=\"dim-note\" id=\"cbNote\" style=\"font-size:12px;color:var(--dim);line-height:34px\"></span></div>\n          </div>\n          <div class=\"kpis mod3\" id=\"cbKpi\" style=\"margin-bottom:14px\"></div>\n          <div class=\"grid g2\">\n            <div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">1</span><h3>教练业绩排名</h3><span class=\"vtype\">横向柱</span></div><div class=\"chartbox\" id=\"cbRankVal\" style=\"aspect-ratio:680/340\"></div></div>\n            <div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">2</span><h3>教练转化率排名</h3><span class=\"vtype\">横向柱</span></div><div class=\"chartbox\" id=\"cbRankRate\" style=\"aspect-ratio:680/340\"></div></div>\n            <div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">3</span><h3>各组业绩对比</h3><span class=\"vtype\">组合图</span></div><div class=\"chartbox\" id=\"cbLeadCmp\" style=\"aspect-ratio:680/340\"></div></div>\n            <div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">4</span><h3>各主管团队对比</h3><span class=\"vtype\">组合图</span></div><div class=\"chartbox\" id=\"cbSupCmp\" style=\"aspect-ratio:680/340\"></div></div>\n            <div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">5</span><h3>人员热力分布</h3><span class=\"vtype\">散点图</span></div><div class=\"chartbox\" id=\"cbScatter\" style=\"aspect-ratio:680/340\"></div></div>\n            <div class=\"card vcard\"><div class=\"card-t\"><span class=\"vno\">6</span><h3>教练业绩明细表</h3><span class=\"vtype\">表格</span></div><div class=\"tbl-wrap\" id=\"cbTable\" style=\"max-height:440px\"></div></div>\n          </div>\n        </div>\n\n</div></div>";
 MOD_TEMPLATES['rank']="<div class=\"mod\" id=\"mod-rank\">\n        <div class=\"page-head\"><h2>排名榜单</h2><button class=\"btn sm pri\" id=\"lbPush\">📤 推送企业微信</button><span class=\"desc\"></span></div>\n        <div class=\"tabbar\" data-tabs>\n          <div class=\"tab active\" data-level=\"营期\">营期排名</div>\n          <div class=\"tab\" data-level=\"负责人\">负责人排名</div>\n          <div class=\"tab\" data-level=\"经理\">经理排名</div>\n          <div class=\"tab\" data-level=\"主管\">主管排名</div>\n          <div class=\"tab\" data-level=\"组长\">组长排名</div>\n          <div class=\"tab\" data-level=\"教练\">教练排名</div>\n        </div>\n        <div id=\"rankContent\"></div>\n      </div>";
 MOD_TEMPLATES['diag']="<div class=\"mod\" id=\"mod-diag\">\n        <div class=\"page-head\"><h2>人员诊断</h2><span class=\"desc\">团队健康度 · 教练明细</span></div>\n        <div class=\"tabbar\" data-tabs>\n          <div class=\"tab active\" data-sub=\"health\">团队健康度</div>\n          <div class=\"tab\" data-sub=\"coachSummary\">教练汇总明细</div>\n          <div class=\"tab\" data-sub=\"coachDaily\">教练分日明细</div>\n        </div>\n        <div class=\"subpanel show\" data-sub=\"health\">\n          <div class=\"tabbar tabbar-sub\" id=\"healthTabs\">\n            <div class=\"tab active\" data-layer=\"营期\">营期层</div>\n            <div class=\"tab\" data-layer=\"负责人\">负责人层</div>\n            <div class=\"tab\" data-layer=\"经理\">经理层</div>\n            <div class=\"tab\" data-layer=\"主管\">主管层</div>\n            <div class=\"tab\" data-layer=\"组长\">组长层</div>\n            <div class=\"tab\" data-layer=\"教练\">教练层</div>\n          </div>\n          <div class=\"grid g2\">\n            <div class=\"card\"><div class=\"card-t\"><h3 id=\"healthChartTitle\">经理层健康度分布</h3></div><div class=\"chartbox\" id=\"healthChart\" style=\"height:300px\"></div></div>\n            <div class=\"card\"><div class=\"card-t\"><h3>分层统计明细</h3><span class=\"sub\" id=\"healthSub\"></span></div><div class=\"tbl-wrap\" id=\"healthTable\" style=\"max-height:300px\"></div></div>\n          </div>\n        </div>\n        <div class=\"subpanel\" data-sub=\"coachSummary\">\n          <div class=\"card\"><div class=\"card-t\"><h3>教练汇总明细</h3><span class=\"sub\" id=\"csSub\"></span><span class=\"spacer\"></span><button class=\"btn\" id=\"csExport\">导出</button></div><div class=\"tbl-wrap\" id=\"csTable\" style=\"max-height:480px\"></div></div>\n        </div>\n        <div class=\"subpanel\" data-sub=\"coachDaily\">\n          <div class=\"filterbar\" style=\"margin-bottom:12px\">\n            <div class=\"fld\"><label>指标切换</label><div style=\"display:flex;gap:6px\"><button class=\"btn on\" id=\"cdRate\">转率</button><button class=\"btn\" id=\"cdVal\">产值</button></div></div>\n          </div>\n          <div class=\"card\"><div class=\"card-t\"><h3 id=\"cdTitle\">教练分日转率明细</h3><span class=\"sub\" id=\"cdSub\"></span></div><div class=\"tbl-wrap\" id=\"cdTable\" style=\"max-height:480px\"></div></div>\n        </div>\n      </div>";
-MOD_TEMPLATES['cmp']="<div class=\"mod\" id=\"mod-cmp\">\n        <div class=\"page-head\"><h2>对比诊断</h2><span class=\"desc\">人员对比 · 营期对比</span></div>\n        <div class=\"tabbar\" data-tabs>\n          <div class=\"tab active\" data-sub=\"cmpPerson\">人员对比</div>\n          <div class=\"tab\" data-sub=\"cmpBatch\">营期对比</div>\n        </div>\n        <div class=\"subpanel show\" data-sub=\"cmpPerson\">\n          <div class=\"filterbar\">\n            <div class=\"fld\"><label>维度</label><select id=\"cmpLevel\"><option>教练</option><option>组长</option><option>主管</option><option>经理</option><option>负责人</option></select></div>\n            <div class=\"fld\" style=\"flex:1;min-width:240px\"><label>选择人员（可多选，不限人数）</label><div class=\"multi\" id=\"cmpSel\"></div></div>\n          </div>\n          <div class=\"grid g2\">\n            <div class=\"card\"><div class=\"card-t\"><h3>人员指标对比</h3><span class=\"spacer\"></span><div class=\"seg\" id=\"cmpPersonMetric\"><button class=\"btn sm on\" data-metric=\"rate\">转率</button><button class=\"btn sm\" data-metric=\"val\">产值</button></div></div><div class=\"chartbox\" id=\"cmpPersonChart\" style=\"height:300px\"></div></div>\n            <div class=\"card\"><div class=\"card-t\"><h3>人员营期明细</h3><span class=\"sub\" id=\"cmpPersonSub\"></span></div><div class=\"tbl-wrap\" id=\"cmpPersonTable\" style=\"max-height:320px\"></div></div>\n          </div>\n        </div>\n        <div class=\"subpanel\" data-sub=\"cmpBatch\">\n          <div class=\"filterbar\"><div class=\"fld\" style=\"flex:1;min-width:280px\"><label>选择营期（可多选，最多6个）</label><div class=\"multi\" id=\"cmpBatchSel\"></div></div></div>\n          <div class=\"grid g2\">\n            <div class=\"card\"><div class=\"card-t\"><h3>营期核心指标对比</h3><span class=\"sub\">柱=总产值（左轴·数值）· 线=总尾款转率（右轴·%）</span></div><div class=\"chartbox\" id=\"cmpBatchChart\" style=\"height:300px\"></div></div>\n            <div class=\"card\"><div class=\"card-t\"><h3>营期转化节奏对比</h3><span class=\"sub\">各营期累计转率（%）</span></div><div class=\"chartbox\" id=\"cmpBatchRhythm\" style=\"height:300px\"></div></div>\n          </div>\n          <div class=\"card\"><div class=\"card-t\"><h3>营期对比明细</h3><span class=\"sub\" id=\"cmpBatchSub\"></span></div><div class=\"tbl-wrap\" id=\"cmpBatchTable\"></div></div>\n        </div>\n      </div>";
+MOD_TEMPLATES['cmp']="<div class=\"mod\" id=\"mod-cmp\">\n        <div class=\"page-head\"><h2>对比诊断</h2><span class=\"desc\">人员对比 · 营期对比</span></div>\n        <div class=\"tabbar\" data-tabs>\n          <div class=\"tab active\" data-sub=\"cmpPerson\">人员对比</div>\n          <div class=\"tab\" data-sub=\"cmpBatch\">营期对比</div>\n        </div>\n        <div class=\"subpanel show\" data-sub=\"cmpPerson\">\n          <div class=\"filterbar\">\n            <div class=\"fld\"><label>维度</label><select id=\"cmpLevel\"><option>教练</option><option>组长</option><option>主管</option><option>经理</option><option>负责人</option></select></div>\n            <div class=\"fld\" style=\"flex:1;min-width:240px\"><label>选择人员（可多选，不限人数）</label><div class=\"multi\" id=\"cmpSel\"></div></div>\n          </div>\n          <div class=\"grid g2\" style=\"grid-template-columns:1fr\">\n            <div class=\"card\"><div class=\"card-t\"><h3>人员指标对比</h3><span class=\"spacer\"></span><div class=\"seg\" id=\"cmpPersonMetric\"><button class=\"btn sm on\" data-metric=\"rate\">转率</button><button class=\"btn sm\" data-metric=\"val\">产值</button></div></div><div class=\"chartbox\" id=\"cmpPersonChart\" style=\"height:360px\"></div></div>\n            <div class=\"card\"><div class=\"card-t\"><h3>人员营期明细</h3><span class=\"sub\" id=\"cmpPersonSub\"></span></div><div class=\"tbl-wrap\" id=\"cmpPersonTable\" style=\"max-height:460px\"></div></div>\n          </div>\n        </div>\n        <div class=\"subpanel\" data-sub=\"cmpBatch\">\n          <div class=\"filterbar\"><div class=\"fld\" style=\"flex:1;min-width:280px\"><label>选择营期（可多选，最多6个）</label><div class=\"multi\" id=\"cmpBatchSel\"></div></div></div>\n          <div class=\"grid g2\">\n            <div class=\"card\"><div class=\"card-t\"><h3>营期核心指标对比</h3><span class=\"sub\">柱=总产值（左轴·数值）· 线=总尾款转率（右轴·%）</span></div><div class=\"chartbox\" id=\"cmpBatchChart\" style=\"height:300px\"></div></div>\n            <div class=\"card\"><div class=\"card-t\"><h3>营期转化节奏对比</h3><span class=\"sub\">各营期累计转率（%）</span></div><div class=\"chartbox\" id=\"cmpBatchRhythm\" style=\"height:300px\"></div></div>\n          </div>\n          <div class=\"card\"><div class=\"card-t\"><h3>营期对比明细</h3><span class=\"sub\" id=\"cmpBatchSub\"></span></div><div class=\"tbl-wrap\" id=\"cmpBatchTable\"></div></div>\n        </div>\n      </div>";
 MOD_TEMPLATES['alert']="<div class=\"mod\" id=\"mod-alert\">\n<div class=\"page-head\"><h2>预警洞察</h2><span class=\"desc\">转化中营期全维度监测 · 汇总+分日双板块 · 对比营期大盘 ▲高▼低</span><span class=\"spacer\"></span>\n<button class=\"btn\" id=\"alRefresh\">刷新检测</button><button class=\"btn pri\" id=\"alReport\">一键生成分析报告</button></div>\n\n<div class=\"card\" id=\"stageCfgCard\"><div class=\"card-t\"><h3>预警判定配置</h3><span class=\"sub\" id=\"stageCfgScope\">按「阶段」字段的 Day 判定</span><span class=\"spacer\"></span><button class=\"btn sm\" id=\"stageCfgReset\" style=\"display:none\">恢复默认</button><button class=\"btn sm pri\" id=\"stageCfgSave\">保存</button></div><div id=\"stageCfgBox\"></div><div id=\"stageCfgMsg\" style=\"font-size:12px;color:var(--dim);margin-top:6px\"></div></div>\n<div class=\"card\"><div class=\"card-t\"><h3>全局风险预警专区</h3><span class=\"sub\">红=严重 · 黄=关注 · 蓝=提示（点击可下钻）</span></div><div id=\"alertZone\"></div></div>\n<div class=\"tabbar\" data-tabs>\n<div class=\"tab active\" data-sub=\"alActive\">转化中营期</div>\n<div class=\"tab\" data-sub=\"alDone\">已结束营期</div>\n</div>\n<div class=\"subpanel show\" data-sub=\"alActive\">\n<div class=\"dimbar\">\n<div class=\"seg\" id=\"alActDim\"><button class=\"btn sm on\" data-dim=\"全部\">全部</button><button class=\"btn sm\" data-dim=\"营期\">营期</button><button class=\"btn sm\" data-dim=\"教练\">教练</button><button class=\"btn sm\" data-dim=\"组长\">组长</button><button class=\"btn sm\" data-dim=\"主管\">主管</button><button class=\"btn sm\" data-dim=\"经理\">经理</button><button class=\"btn sm\" data-dim=\"负责人\">负责人</button></div>\n<div class=\"fld\" style=\"margin-left:10px\"><label style=\"display:inline-block;font-size:12px;color:var(--dim);margin-right:6px\">营期</label><select id=\"alActBatch\" style=\"height:30px;border:1px solid var(--line);border-radius:7px;background:var(--input,#0d1728);color:var(--fg);padding:0 8px;font-size:12px;min-width:110px\"></select></div><input type=\"text\" id=\"alActName\" placeholder=\"姓名过滤明细…\" style=\"max-width:150px;height:30px;border:1px solid var(--line);border-radius:7px;background:var(--input,#0d1728);color:var(--fg);padding:0 10px;font-size:12px;margin-left:10px\">\n<span class=\"spacer\"></span>\n<button class=\"btn sm pri\" id=\"alActPush\">📤 推送企微（按营期拆图·仅汇总）</button>\n</div>\n<div class=\"card\"><div class=\"card-t\"><h3>① 汇总数据</h3><span class=\"sub\" id=\"alActSumSub\"></span></div>\n<div class=\"tbl-wrap\" id=\"alActSumTable\" style=\"max-height:520px\"></div></div>\n<div class=\"card\"><div class=\"card-t\"><h3>② 分日数据</h3><span class=\"sub\" id=\"alActDaySub\"></span><span class=\"spacer\"></span><div class=\"seg\" id=\"alActMetric\"><button class=\"btn sm on\" data-metric=\"rate\">转率</button><button class=\"btn sm\" data-metric=\"val\">产值</button></div></div>\n<div class=\"tbl-wrap\" id=\"alActDayTable\" style=\"max-height:520px\"></div></div>\n</div>\n<div class=\"subpanel\" data-sub=\"alDone\">\n<div class=\"dimbar\">\n<div class=\"seg\" id=\"alDoneDim\"><button class=\"btn sm on\" data-dim=\"全部\">全部</button><button class=\"btn sm\" data-dim=\"营期\">营期</button><button class=\"btn sm\" data-dim=\"教练\">教练</button><button class=\"btn sm\" data-dim=\"组长\">组长</button><button class=\"btn sm\" data-dim=\"主管\">主管</button><button class=\"btn sm\" data-dim=\"经理\">经理</button><button class=\"btn sm\" data-dim=\"负责人\">负责人</button></div>\n<div class=\"fld\" style=\"margin-left:10px\"><label style=\"display:inline-block;font-size:12px;color:var(--dim);margin-right:6px\">营期</label><select id=\"alDoneBatch\" style=\"height:30px;border:1px solid var(--line);border-radius:7px;background:var(--input,#0d1728);color:var(--fg);padding:0 8px;font-size:12px;min-width:110px\"></select></div><input type=\"text\" id=\"alDoneName\" placeholder=\"姓名过滤明细…\" style=\"max-width:150px;height:30px;border:1px solid var(--line);border-radius:7px;background:var(--input,#0d1728);color:var(--fg);padding:0 10px;font-size:12px;margin-left:10px\">\n<span class=\"spacer\"></span>\n<button class=\"btn sm pri\" id=\"alDonePush\">📤 推送企微（按营期拆图·仅汇总）</button>\n</div>\n<div class=\"card\"><div class=\"card-t\"><h3>① 汇总数据</h3><span class=\"sub\" id=\"alDoneSumSub\"></span></div>\n<div class=\"tbl-wrap\" id=\"alDoneSumTable\" style=\"max-height:520px\"></div></div>\n<div class=\"card\"><div class=\"card-t\"><h3>② 分日数据</h3><span class=\"sub\" id=\"alDoneDaySub\"></span></div>\n<div class=\"tbl-wrap\" id=\"alDoneDayTable\" style=\"max-height:520px\"></div></div>\n</div>\n<div class=\"grid\">\n<div class=\"card\"><div class=\"card-t\"><h3>企业微信推送</h3><span class=\"sub\">每日定时推送转化中营期全维度汇总截图+结论</span></div>\n<div class=\"field\"><label>目标群名称</label><input id=\"alGroup\" placeholder=\"推送测试\"></div>\n<div class=\"field\"><label>每日推送时间（小时:分钟）</label><input id=\"alTime\" value=\"09:00\"></div>\n<div class=\"set-row\"><div class=\"s-info\"><div class=\"s-t\">每日自动推送</div></div><div class=\"switch on\" id=\"swAlPush\"></div></div>\n<button class=\"btn pri\" id=\"alTestPush\" style=\"width:100%;justify-content:center\">测试推送（企微群）</button>\n</div>\n</div>\n<div class=\"card\"><div class=\"card-t\"><h3>前7日目标转率</h3><span class=\"sub\">设置每个营期前7日目标转率，未达标将在当晚 22:00 推送提醒</span></div>\n<div id=\"alTarget\"></div>\n<div id=\"alTargetMsg\" style=\"font-size:12px;color:var(--dim);margin-top:6px\"></div>\n</div>\n</div>\n      ";;
 MOD_TEMPLATES['projCompare']="<div class=\"mod\" id=\"mod-projCompare\">\n        <div class=\"page-head\"><h2>项目对比</h2><span class=\"desc\">不同项目月度大盘数据对比 · 输出结论</span></div>\n        <div class=\"filterbar\">\n          <div class=\"fld\"><label>项目 A</label><select id=\"pcA\"></select></div>\n          <div class=\"fld\"><label>项目 B</label><select id=\"pcB\"></select></div>\n          <div class=\"fld\"><label>品类</label><select id=\"pcCate\"><option>全部品类</option><option>电商数据</option><option>大课数据</option></select></div>\n        </div>\n        <div class=\"grid g2\">\n          <div class=\"card\"><div class=\"card-t\"><h3>月度大盘对比</h3><span class=\"spacer\"></span><div class=\"legend\" id=\"pcLegend\"></div></div><div class=\"chartbox\" id=\"pcChart\" style=\"height:300px\"></div></div>\n          <div class=\"card\"><div class=\"card-t\"><h3>对比结论</h3></div><div id=\"pcConcl\" style=\"font-size:13px;color:#c7d3e6;line-height:1.9\"></div></div>\n        </div>\n        <div class=\"card\"><div class=\"card-t\"><h3>项目大盘指标对比明细</h3></div><div class=\"tbl-wrap\" id=\"pcTable\" style=\"max-height:360px\"></div></div>\n      </div>";
 MOD_TEMPLATES['ai']="<div class=\"mod\" id=\"mod-ai\">\n        <div class=\"page-head\"><h2>AI 智能分析报告</h2><span class=\"desc\">基于当前筛选数据自动生成业务结论</span><span class=\"spacer\"></span><button class=\"btn pri\" id=\"aiRun\">重新分析</button></div>\n        <div class=\"grid g12\">\n          <div class=\"card\"><div class=\"card-t\"><h3>分析结论</h3><span class=\"sub\" id=\"aiScope\"></span></div><div id=\"aiResult\"><div class=\"ai-loading\"><div class=\"ai-spinner\"></div>AI 正在分析数据...</div></div></div>\n          <div class=\"card\"><div class=\"card-t\"><h3>关键指标快照</h3></div><div id=\"aiKpi\" class=\"chartbox\" style=\"height:320px\"></div></div>\n        </div>\n        <div class=\"card\"><div class=\"card-t\"><h3>异常点位清单</h3><span class=\"sub\">偏高/偏低/趋势异常</span></div><div class=\"tbl-wrap\" id=\"aiAnomaly\" style=\"max-height:360px\"></div></div>\n      </div>";
@@ -1754,7 +1754,7 @@ function barChart(container,groups,opts){
     const tipTxt=opts.tipVal? opts.tipVal(v,si,gi) : (opts.pct?fmtPct(v,1):(opts.fmt?opts.fmt(v):fmt(v,0)));
     r.addEventListener('mousemove',e=>showTip(container,tip,cats[gi]+' · '+se.name+'：'+tipTxt,e));
     r.addEventListener('mouseleave',()=>tip.style.opacity='0');
-    svg.appendChild(r); if(opts.labels && (!opts.stack || hgt>=16)){ const lx=opts.stack? cx : (cx-bw/2+si*bw2+bw2/2); const ly=opts.stack? (by+hgt/2+3.5) : (by-5); const raw=opts.lbl? opts.lbl(v,si,gi) : null; const lines=Array.isArray(raw)? raw : (raw==null? null : [raw]); if(lines){ lines.forEach((ln,li)=>{ const txt=(typeof ln==='object'&&ln.t!=null)? ln.t : ln; const col=(typeof ln==='object'&&ln.c)? ln.c : (opts.stack?'#fff':(opts.labelColor||'#c7d3e6')); const fz=(typeof ln==='object'&&ln.fs)? ln.fs : (opts.stack?10.5:(lines.length>1?10:13)); const fw=(typeof ln==='object'&&ln.w)? ln.w : 700; const lly=ly-li*(fz+4); const lb=svgEl('text',{x:lx,y:lly,'text-anchor':'middle','font-size':fz,fill:col,'font-weight':fw,'stroke':opts.stack?'rgba(13,23,40,.55)':'none','paint-order':'stroke','stroke-width':opts.stack?2.5:0}); lb.textContent=txt; svg.appendChild(lb); }); } } if(!sNames.includes(se.name)){ sNames.push(se.name); sCols.push(se.color); } }); });
+    svg.appendChild(r); if(opts.labels && (!opts.stack || hgt>=8)){ const lx=opts.stack? cx : (cx-bw/2+si*bw2+bw2/2); const ly=opts.stack? (by+hgt/2+3.5) : (by-5); const raw=opts.lbl? opts.lbl(v,si,gi) : null; const lines=Array.isArray(raw)? raw : (raw==null? null : [raw]); if(lines){ lines.forEach((ln,li)=>{ const txt=(typeof ln==='object'&&ln.t!=null)? ln.t : ln; const col=(typeof ln==='object'&&ln.c)? ln.c : (opts.stack?'#fff':(opts.labelColor||'#c7d3e6')); const fz=(typeof ln==='object'&&ln.fs)? ln.fs : (opts.stack?10.5:(lines.length>1?10:13)); const fw=(typeof ln==='object'&&ln.w)? ln.w : 700; const lly=ly-li*(fz+4); const lb=svgEl('text',{x:lx,y:lly,'text-anchor':'middle','font-size':fz,fill:col,'font-weight':fw,'stroke':opts.stack?'rgba(13,23,40,.55)':'none','paint-order':'stroke','stroke-width':opts.stack?2.5:0}); lb.textContent=txt; svg.appendChild(lb); }); } } if(!sNames.includes(se.name)){ sNames.push(se.name); sCols.push(se.color); } }); });
   if(opts.legend!==false) renderChartLegend(container,sNames.map((nm,i)=>({name:nm,color:sCols[i]})));
 }
 
@@ -2350,7 +2350,8 @@ function renderMDaily(){
    渲染 · 营期数据
    ============================================================ */
 let crossDim='', crossName='', vizAgg='营期';
-let rhythmMode='rate', rhythmBatch='', rhythmBase='lastBatch';
+let rhythmMode='rate', rhythmBatch='', rhythmBase='lastBatch', rhythmBaseBatch='';
+/* rhythmBase: lastBatch=上个营期 / lastMonth=上月大盘 / curMonth=本月大盘 / custom=自定义营期（2026-09-16 新增，单选） */
 let rhythmDetailDim='', rhythmDetailName='', rhythmTrendDim='营期', rhythmDetailMetric='rate';
 let coachBatch='', cbSortMode='val';
 const VIZ_COLORS=['#22d3ee','#4f8cff','#10b981','#f59e0b','#ef4444','#a78bfa','#f472b6','#34d399','#fbbf24'];
@@ -3033,7 +3034,7 @@ function renderPCompare(){
   const colors=['#22d3ee','#f59e0b','#a78bfa'];
   const DL=dayLabels();
   curve.innerHTML='';
-  lineChart(curve, picks.map((p,i)=>({name:p.b,data:DL.map((d,di)=>cumRate(p.rows,di+1)),color:colors[i%3]})),{cats:DL,pct:true,h:360});
+  lineChart(curve, picks.map((p,i)=>({name:p.b,data:DL.map((d,di)=>cumRate(p.rows,di+1)),color:colors[i%3]})),{cats:DL,pct:true,h:360,labels:true});
   // ③ 人员结构对比（头部20%/中部60%/尾部20% 教练占比）
   struct.innerHTML='';
   const structRows=picks.map(p=>{
@@ -3046,7 +3047,7 @@ function renderPCompare(){
     {name:'头部20%',value:s.head,color:'#10b981'},
     {name:'中部60%',value:s.mid,color:'#22d3ee'},
     {name:'尾部20%',value:s.tail,color:'#ef4444'}
-  ]})), {pct:true, stack:true, h:360});
+  ]})), {pct:true, stack:true, h:360, labels:true});
 }
 
 function buildRhythmUI(){
@@ -3065,7 +3066,9 @@ function buildRhythmUI(){
         '<option value="lastBatch">上个营期</option>'+
         '<option value="lastMonth">上月大盘</option>'+
         '<option value="curMonth">本月大盘</option>'+
+        '<option value="custom">自定义营期</option>'+
       '</select></div>'+
+      '<div class="fld" id="rhythmBaseBatchWrap" style="display:none"><label>基准营期</label><select id="rhythmBaseBatch"></select></div>'+
       '<div class="fld"><span class="dim-note" id="rhythmBaseNote" style="font-size:12px;color:var(--dim);line-height:34px"></span><button class="btn sm pri" id="pRhythmAI" style="margin-left:14px">🧠 智能分析</button></div>'+
     '</div>'+
     // ===== 模块 1：单营期对比基准 =====
@@ -3183,10 +3186,21 @@ function renderPRhythm(){
   if(baseSel){
     // 非「恰 1 个月」时，上月大盘/本月大盘无具体月份可参照，仅保留「上个营期」对比
     [...baseSel.options].forEach(o=>{ const hide=!isSingleMonth()&&(o.value==='lastMonth'||o.value==='curMonth'); o.disabled=hide; o.style.display=hide?'none':''; });
-    if(!['lastBatch','lastMonth','curMonth'].includes(rhythmBase)) rhythmBase='lastBatch';
+    if(!['lastBatch','lastMonth','curMonth','custom'].includes(rhythmBase)) rhythmBase='lastBatch';
     if(!isSingleMonth() && (rhythmBase==='lastMonth'||rhythmBase==='curMonth')) rhythmBase='lastBatch';
     baseSel.value=rhythmBase;
     baseSel.onchange=()=>{ rhythmBase=baseSel.value; renderPRhythm(); };
+    // ★自定义基准营期（单选）：选「自定义营期」时显示，默认取上一期
+    const bbWrap=$('#rhythmBaseBatchWrap'), bbSel=$('#rhythmBaseBatch');
+    if(bbSel){
+      const cn0=parseInt((rhythmBatch+'').replace(/\D/g,''),10)||0;
+      const blist=Object.keys(by).sort((a,b)=>(parseInt(a.replace(/\D/g,''),10)||0)-(parseInt(b.replace(/\D/g,''),10)||0));
+      const bDef='第'+(cn0-1)+'期';
+      if(!rhythmBaseBatch || blist.indexOf(rhythmBaseBatch)<0) rhythmBaseBatch=blist.indexOf(bDef)>=0? bDef : (blist[0]||'');
+      bbSel.innerHTML=blist.map(b=>'<option'+(b===rhythmBaseBatch?' selected':'')+'>'+esc(b)+'</option>').join('');
+      bbSel.onchange=()=>{ rhythmBaseBatch=bbSel.value; renderPRhythm(); };
+    }
+    if(bbWrap) bbWrap.style.display=(rhythmBase==='custom')? '':'none';
   }
   // —— 当前营期数据 ——
   const rr=by[rhythmBatch]||[]; if(!rr.length){ clearEmpty(); return; }
@@ -3214,6 +3228,12 @@ function renderPRhythm(){
     histRows=all.filter(r=>(r['月份']||'')===pm);
     if(histRows.length) baseLabel='上月大盘（'+pm+' · '+distinct(histRows,r=>r['营期数']).length+' 期 · '+histRows.length+' 条班级）';
     else { baseLabel='上月（'+pm+'）无数据，已回退：'; }
+  }
+  if(!baseLabel && rhythmBase==='custom'){
+    const bb=rhythmBaseBatch;
+    histRows=bb? all.filter(r=>(r['营期数']||'')===bb) : [];
+    if(histRows.length) baseLabel='自定义营期（'+bb+' · '+histRows.length+' 条班级）';
+    else baseLabel='自定义营期（'+(bb||'未选')+'）无数据，已回退：';
   }
   if(!baseLabel){
     const curOpen=(rr[0]['开营时间']||'').toString();
@@ -3276,7 +3296,7 @@ function renderPRhythm(){
   const cumT=$('#rhythmCumTitle'), cumS=$('#rhythmCumSub');
   if(cumT)cumT.textContent=isRate?'14 天累计转化率曲线':'14 天累计人均产值曲线';
   if(cumS)cumS.textContent=(rhythmBatch||'')+' vs '+baseLabel+' · '+(isRate?'累计转化率':'累计人均产值(元)');
-  lineChart(cumEl,[{name:rhythmBatch||'当前营期',data:curCum,color:'#22d3ee'},{name:'基准均值',data:prevCum,color:'#f59e0b'}],{cats:DL,pct:isRate,h:340});
+  lineChart(cumEl,[{name:rhythmBatch||'当前营期',data:curCum,color:'#22d3ee'},{name:'基准均值',data:prevCum,color:'#f59e0b'}],{cats:DL,pct:isRate,h:340,labels:true});
   // —— 每日新增对比图已删除（v5 用户需求：替换为 7 字段横向表）——
   renderRhythmTable7(rr, histRows, pCur, pPrev, isRate);
   // 组合图已删除（v4 用户需求）
@@ -3616,13 +3636,13 @@ function drawLeaderboard(level){
   const rows=filteredRows();
   const scopeReady = scopeSelected();
   if(!scopeReady){
-    tbody.innerHTML='<tr><td colspan="18" class="cv-nodata">请先在顶部选择 项目 / 链路 / 品类（月份/营期可不选），选择后将展示对应排名榜单</td></tr>';
+    tbody.innerHTML='<tr><td colspan="20" class="cv-nodata">请先在顶部选择 项目 / 链路 / 品类（月份/营期可不选），选择后将展示对应排名榜单</td></tr>';
     if(top) top.innerHTML='<div class="cv-nodata">请先选择范围</div>';
     if(sub) sub.textContent=''; if(note) note.textContent='';
     return;
   }
   if(!rows.length){
-    tbody.innerHTML='<tr><td colspan="18" class="cv-nodata">当前范围无排名数据</td></tr>';
+    tbody.innerHTML='<tr><td colspan="20" class="cv-nodata">当前范围无排名数据</td></tr>';
     if(top) top.innerHTML='<div class="cv-nodata">无数据</div>';
     if(sub) sub.textContent=''; if(note) note.textContent='';
     return;
@@ -3643,6 +3663,14 @@ function drawLeaderboard(level){
   let items=[];
   if(level==='营期'){
     items=allBs.map(b=>{ const rr=by[b]||[]; const m=aggMetrics(rr); return {name:b, m, rr, r0:rr[0]||{}}; });
+  } else if(level==='教练'){
+    /* ★2026-09-16：教练维度改为「按班级ID 拆行」——一个班级一行（班级id 在源数据里唯一，全表已核）。
+       原因：同一教练可带多个班级，且存在原教练甩班、他人接手的情况；只有以班级为单位才能区分与对账。 */
+    items=scope.filter(r=>String(r['教练']||'').trim()).map((r,i)=>{
+      const cid=String(r['班级id']||'');
+      return { name:(r['教练']||'')+' '+cid, m:aggMetrics([r]), rr:[r], r0:r,
+               _ck:cid||((r['教练']||'')+'#'+i), _classid:cid };
+    });
   } else {
     const set=new Set();
     items=[]; scope.forEach(r=>{ const k=r[level]||''; if(k && !set.has(k)){ set.add(k); const c=scope.filter(x=>(x[level]||'')===k); items.push({name:k, m:aggMetrics(c), rr:c, r0:c[0]||{}}); } });
@@ -3651,7 +3679,8 @@ function drawLeaderboard(level){
   // 排序 + 双排名
   const byVal=items.slice().sort((a,b)=>b.m.总产值-a.m.总产值);
   const byRate=items.slice().sort((a,b)=>b.m.总尾款转化率-a.m.总尾款转化率);
-  const valRank={}, rateRank={}; byVal.forEach((x,i)=>valRank[x.name]=i+1); byRate.forEach((x,i)=>rateRank[x.name]=i+1);
+  const _keyOf=x=> x._ck || x.name;   // ★教练拆行后同一教练名下多行，必须用班级ID 作为唯一键
+  const valRank={}, rateRank={}; byVal.forEach((x,i)=>valRank[_keyOf(x)]=i+1); byRate.forEach((x,i)=>rateRank[_keyOf(x)]=i+1);
   const sorted=isRate? byRate : byVal;
   const n=sorted.length;
   const headN=Math.round(n*0.2), midHiN=Math.round(n*0.3), midLoN=Math.round(n*0.3), tailN=n-headN-midHiN-midLoN;
@@ -3661,11 +3690,11 @@ function drawLeaderboard(level){
     if(rank<=headN+midHiN+midLoN) return {t:'中下30%',cls:'r3',bg:'rgba(245,158,11,.10)',col:'#f59e0b'};
     return {t:'尾部20%',cls:'r4',bg:'rgba(239,68,68,.12)',col:'#ef4444'}; };
   const mValAvg=aggMetrics(scope).总产值;
-  // —— 分组表头（2 行 6 组 18 列）——
+  // —— 分组表头（2 行 6 组 20 列；归属组含「班级ID」，2026-09-16）——
   const th=(
     '<tr class="lb-th-g">'+
       '<th colspan="1" class="g1">排名 / 名称</th>'+
-      '<th colspan="6" class="g2">归属</th>'+
+      '<th colspan="7" class="g2">归属</th>'+
       '<th colspan="2" class="g3">规模</th>'+
       '<th colspan="4" class="g4">转化</th>'+
       '<th colspan="3" class="g5">产值</th>'+
@@ -3673,7 +3702,7 @@ function drawLeaderboard(level){
     '</tr>'+
     '<tr class="lb-th-s">'+
       '<th>排名 / 名称</th>'+
-      '<th>营期</th><th>教练</th><th>组长</th><th>主管</th><th>经理</th><th>负责人</th>'+
+      '<th>营期</th><th>班级ID</th><th>教练</th><th>组长</th><th>主管</th><th>经理</th><th>负责人</th>'+
       '<th>原始人数</th><th>授权人数</th>'+
       '<th>总流水</th><th>总单数</th><th>总转率</th><th>私聊占比</th>'+
       '<th>总产值</th><th>差值营收</th><th>产值差值</th>'+
@@ -3691,7 +3720,7 @@ function drawLeaderboard(level){
     return '<div class="lb-ava" style="background:linear-gradient(135deg,'+col+'33,'+col+'88);color:'+col+'">'+ch+
       (medal?'<span class="lb-medal">'+medal+'</span>':'')+'</div>';
   };
-  // —— 行渲染（18 列）——
+  // —— 行渲染（20 列）——
   let h='';
   sorted.forEach((it,i)=>{
     const m=it.m, rank=i+1, r=rangeOf(rank);
@@ -3702,9 +3731,18 @@ function drawLeaderboard(level){
     const lvCells=LV_COLS.map(L=>{
       const v=(L==='营期'? b : (it.r0[dimColOf(L)]||''));
       const rk=LV_RANK[L];
-      if(rk===_cur) return '<td><b>'+esc(v||'—')+'</b></td>';
-      if(rk>_cur)   return '<td style="color:var(--dim)">—</td>';
-      return '<td style="color:var(--dim)">'+esc(v||'—')+'</td>';
+      let cell;
+      if(rk===_cur) cell='<td><b>'+esc(v||'—')+'</b></td>';
+      else if(rk>_cur)   cell='<td style="color:var(--dim)">—</td>';
+      else cell='<td style="color:var(--dim)">'+esc(v||'—')+'</td>';
+      /* ★2026-09-16「班级ID」紧随「营期」列：仅教练维度（最细层级）有意义；
+         更粗维度是多个班级的聚合，班级ID 不唯一 → 显示 —（与播报板块做法一致） */
+      if(L==='营期'){
+        cell += (level==='教练')
+          ? '<td><b>'+esc(it._classid||'—')+'</b></td>'
+          : '<td style="color:var(--dim)">—</td>';
+      }
+      return cell;
     }).join('');
     const valCol=isRate? '' : 'style="background:rgba(34,211,238,.08);font-weight:800;color:#67e8f9"';
     const rateCol=isRate? 'style="background:rgba(34,211,238,.08);font-weight:800;color:#67e8f9"' : '';
@@ -3720,20 +3758,20 @@ function drawLeaderboard(level){
       '<td class="num">'+fmt(m.总产值,0)+'</td>'+
       '<td class="num lb-diff '+(dRev>=0?'pos':'neg')+'">'+(dRev>=0?'+':'')+fmt(dRev,0)+'</td>'+
       '<td class="num lb-diff '+(dVal>=0?'pos':'neg')+'">'+(dVal>=0?'+':'')+fmt(dVal,0)+'</td>'+
-      '<td class="num" '+valCol+'>'+valRank[it.name]+'/'+n+'</td>'+
-      '<td class="num" '+rateCol+'>'+rateRank[it.name]+'/'+n+'</td>'+
+      '<td class="num" '+valCol+'>'+(valRank[_keyOf(it)]||'')+'/'+n+'</td>'+
+      '<td class="num" '+rateCol+'>'+(rateRank[_keyOf(it)]||'')+'/'+n+'</td>'+
       '<td><span class="lb-range-tag" style="background:'+r.bg+';color:'+r.col+'">'+r.t+'</span></td>'+
     '</tr>';
   });
-  tbody.innerHTML=h||'<tr><td colspan="19" class="cv-nodata">无数据</td></tr>';
+  tbody.innerHTML=h||'<tr><td colspan="20" class="cv-nodata">无数据</td></tr>';
   thead.innerHTML=th;
-  // 导出（18 列）
+  // 导出（21 列；含班级ID）
   const exp=$('#lbExport');
   const pb=$('#lbPush'); if(pb){ pb.onclick=()=>{ buildPushModal(); openPushModal(); }; }
   if(exp) exp.onclick=()=>{
-    const headers='排名,名称,营期,教练,组长,主管,经理,负责人,原始人数,授权人数,总流水,总单数,总转率,私聊占比,总产值,差值营收,产值差值,产值排名,转率排名,排名范围';
+    const headers='排名,名称,营期,班级ID,教练,组长,主管,经理,负责人,原始人数,授权人数,总流水,总单数,总转率,私聊占比,总产值,差值营收,产值差值,产值排名,转率排名,排名范围';
     const csv=sorted.map((it,i)=>{ const m=it.m, dV=m.总产值-(mValAvg||0), dR=dV*m.原始人数, r=rangeOf(i+1);
-      return (i+1)+',"'+it.name+'",'+(it.r0['营期数']||'')+','+(it.r0['教练']||'')+','+(it.r0['组长']||'')+','+(it.r0['主管']||'')+','+(it.r0['经理']||'')+','+(it.r0[dimColOf(OWNER)]||'')+','+m.原始人数+','+(m.授权人数||0)+','+m.总流水+','+m.总单数+','+m.总尾款转化率.toFixed(4)+','+m.私聊占比.toFixed(4)+','+m.总产值.toFixed(2)+','+dR.toFixed(2)+','+dV.toFixed(2)+','+valRank[it.name]+','+rateRank[it.name]+','+r.t; }).join('\n');
+      return (i+1)+',"'+it.name+'",'+(it.r0['营期数']||'')+',"'+(it._classid||'')+'",'+(it.r0['教练']||'')+','+(it.r0['组长']||'')+','+(it.r0['主管']||'')+','+(it.r0['经理']||'')+','+(it.r0[dimColOf(OWNER)]||'')+','+m.原始人数+','+(m.授权人数||0)+','+m.总流水+','+m.总单数+','+m.总尾款转化率.toFixed(4)+','+m.私聊占比.toFixed(4)+','+m.总产值.toFixed(2)+','+dR.toFixed(2)+','+dV.toFixed(2)+','+(valRank[_keyOf(it)]||'')+','+(rateRank[_keyOf(it)]||'')+','+r.t; }).join('\n');
     download((level||'rank')+'-排名榜单-'+new Date().toISOString().slice(0,10)+'.csv', headers+'\n'+csv);
   };
   // TOP 对比（右侧）
@@ -3941,6 +3979,12 @@ function rankItemsFor(cfg){
   if(cfg.level==='营期'){
     const list=cfg.batch?[cfg.batch]:bs;
     items=list.map(b=>({ name:b, m:aggMetrics(by[b]||[]) })).filter(x=>x.m.原始人数>0);
+  } else if(cfg.level==='教练'){
+    /* ★2026-09-16：与页面榜单口径保持一致 —— 教练维度按班级ID 拆行（一个班一行，name = 教练名 + 班级ID） */
+    items=scope.filter(r=>String(r['教练']||'').trim()).map(r=>{
+      const cid=String(r['班级id']||'');
+      return { name:(r['教练']||'')+' '+cid, m:aggMetrics([r]) };
+    }).filter(x=>x.m.原始人数>0);
   } else {
     const seen={};
     scope.forEach(r=>{ const k=r[lvCol]||''; if(k && !seen[k]){ seen[k]=1; items.push({ name:k, m:aggMetrics(scope.filter(x=>(x[lvCol]||'')===k)) }); } });
@@ -4792,7 +4836,10 @@ function renderCmpPerson(){
   const rows=filteredRows();
   $('#cmpLevel').value=cmpLevel;
   const people=distinct(rows,r=>r[dimColOf(cmpLevel)]).filter(p=>p).sort();
-  if(cmpSel.filter(p=>people.includes(p)).length===0) cmpSel=people.slice(0,Math.min(2,people.length));
+  // ★2026-09-16：逐个剔除「在当前筛选范围内已无数据」的对象。
+  //   原实现只在「全部失效」时才重置 → 切换月份/营期后部分对象失效时会留下空柱子（barChart 对 0 值不绘柱）。
+  cmpSel=cmpSel.filter(p=>people.includes(p));
+  if(!cmpSel.length) cmpSel=people.slice(0,Math.min(2,people.length));
   const sel=$('#cmpSel'); sel.style.maxHeight='120px'; sel.style.overflowY='auto';
   sel.innerHTML=people.map(p=>'<span class="chip'+(cmpSel.includes(p)?' on':'')+'" data-p="'+esc(p)+'">'+esc(p)+'</span>').join('');
   sel.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{ const p=c.dataset.p; if(cmpSel.includes(p)){ cmpSel=cmpSel.filter(x=>x!==p); } else { cmpSel.push(p); } renderCmpPerson(); });
@@ -4804,7 +4851,7 @@ function renderCmpPerson(){
   const isVal=(cmpPersonMetric==='val');
   // 图表（人员不设上限：容器横向滚动 + 动态最小宽度，避免多人时柱体过挤）
   const chartBox=$('#cmpPersonChart'); if(chartBox) chartBox.style.overflowX='auto';
-  const groups=cmpSel.map(p=>({p,m:aggMetrics(rows.filter(r=>(r[dimColOf(cmpLevel)]||'')===p))}));
+  const groups=cmpSel.map(p=>({p,m:aggMetrics(rows.filter(r=>(r[dimColOf(cmpLevel)]||'')===p))})).filter(g=>g.m.原始人数>0);
   barChart(chartBox,groups.map(g=>({label:g.p,series:[{name:isVal?'总产值':'总尾款转率',value:isVal?g.m.总产值:g.m.总尾款转化率,color:g.p===cmpSel[0]?'#22d3ee':'#4f8cff'}]})),
     isVal? {h:280,legend:false,labels:true,fmt:v=>fmt(v,1),lbl:v=>({t:fmt(v,1)})}
          : {h:280,legend:false,pct:true,labels:true,lbl:v=>({t:fmtPct(v,1)})});
@@ -4843,7 +4890,7 @@ function renderCmpBatch(){
   h+='</tbody></table>'; $('#cmpBatchTable').innerHTML=h;
   // 节奏对比
   const days=dayLabels(); const series=groups.map((g,i)=>({name:g.b,color:CMP_COLORS[i%4],data:days.map((d,j)=>{ let s=0; for(let k=1;k<=j+1;k++)s+=sum(rows.filter(r=>(r['营期数']||'')===g.b),r=>r['D'+k+'转化人数']); const p=sum(rows.filter(r=>(r['营期数']||'')===g.b),r=>r['原始人数']); return p?s/p:0; })}));
-  lineChart($('#cmpBatchRhythm'),series,{cats:days,pct:true,h:300});
+  lineChart($('#cmpBatchRhythm'),series,{cats:days,pct:true,h:300,labels:true});
 }
 
 /* 预警判定配置器（跟随当前选中链路：选中链路=改该链路；未选=改全局默认） */
@@ -6789,7 +6836,7 @@ function renderProjCompare(){
     const seriesB=mo.map(m=>{ const f=pcFactor(monthRows(rowsB,m)); return useVal? f.v : f.r; });
     const kA=pcFactor(rowsA), kB=pcFactor(rowsB);
     $('#pcLegend').innerHTML='<span><i style="background:#22d3ee"></i>'+esc(A)+'（'+rowsA.length+' 条）</span><span><i style="background:#4f8cff"></i>'+esc(B)+'（'+rowsB.length+' 条）</span>';
-    lineChart($('#pcChart'),[{name:A,data:seriesA,color:'#22d3ee'},{name:B,data:seriesB,color:'#4f8cff'}],{cats:mo,pct:!useVal,h:300,legend:false});
+    lineChart($('#pcChart'),[{name:A,data:seriesA,color:'#22d3ee'},{name:B,data:seriesB,color:'#4f8cff'}],{cats:mo,pct:!useVal,h:300,legend:false,labels:true});
     const dRate=(kA.r-kB.r)*100;
     const dVal=kB.v? (kA.v-kB.v)/kB.v*100 : 0;
     $('#pcConcl').innerHTML='<div class="ai-card"><div class="ai-h">对比结论 · '+esc(cLabel)+'</div><div class="ai-b">'
